@@ -7,3 +7,15 @@ It is written in pure Javascript w/ Canvas and WebGL2 rendering and no other fra
 It's fully playable at http://light.jgefroh.com.
 
 This is not intended to be used in a commercial or production environment - it was just a fun hobby project I wrote.
+
+---
+
+# Screenshots
+
+https://github.com/JGefroh/core-light/blob/main/static/screenshots/screenshot-1.jpg
+
+
+<img width="2043" src="https://github.com/JGefroh/core-light/blob/main/static/screenshots/screenshot-1.jpg">
+<img width="2037" src="https://github.com/JGefroh/core-light/blob/main/static/screenshots/screenshot-2.jpg">
+
+-----
