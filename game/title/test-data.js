@@ -18,9 +18,9 @@ import TurnsTowardsComponent from '@game/features/turn-towards-cursor/turns-towa
 import WeaponComponent from '@game/features/weapons/weapon-component';
 import FootstepFxComponent from '@game/features/footstep-fx/footstep-fx-component'
 import MaterialComponent from '../engine/material/material-component';
-import AiComponent from '../engine/ai/ai-component';
+import AiComponent from '@game/engine/ai/ai-component';
 import AudioListenerComponent from '../engine/audio/audio-listener-component';
-import HealthComponent from '../features/combat/health-component';
+import HealthComponent from '@game/genre/combat/health-component';
 
 export function createTestData() {
     let player = addPlayer(310, -450)

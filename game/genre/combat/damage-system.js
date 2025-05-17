@@ -8,7 +8,7 @@ import PositionComponent from '@game/engine/position/position-component';
 import RenderComponent from '@game/engine/renderer/render-component';
 import AiComponent from '@game/engine/ai/ai-component';
 import MaterialComponent from '@game/engine/material/material-component';
-import HealthComponent from '../combat/health-component';
+import HealthComponent from './health-component';
 
 
 export default class DamageSystem extends System {
