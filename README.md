@@ -12,10 +12,18 @@ This is not intended to be used in a commercial or production environment - it w
 
 # Screenshots
 
-https://github.com/JGefroh/core-light/blob/main/static/screenshots/screenshot-1.jpg
-
-
 <img width="2043" src="https://github.com/JGefroh/core-light/blob/main/static/screenshots/screenshot-1.jpg">
 <img width="2037" src="https://github.com/JGefroh/core-light/blob/main/static/screenshots/screenshot-2.jpg">
 
 -----
+
+# Folder Structure
+
+`/game/engine` contains generic mechanism implementations of generc systems like Rendering, AI, Audio, Collision, etc.
+`/game/features` contains game-specific logic such as implementations of AI, weapons, map generation, and special effects.
+`/game/specifics` contains a few configuration items.
+
+---
+
+`/main.js` bootstraps the game and primary rendering canvases.
+`/game/title/start-game.js` contains the bootstrapping of Core, Systems, and Tags.
