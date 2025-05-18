@@ -17,6 +17,16 @@ export default class InputConfigurationSystem extends System {
             's_hold': 'move_down',
             'r_release': 'reload',
 
+
+            'ArrowUp_press': 'move_up',
+            'ArrowUp_hold': 'move_up',
+            'ArrowLeft_press': 'move_left',
+            'ArrowLeft_hold': 'move_left',
+            'ArrowRight_press': 'move_right',
+            'ArrowRight_hold': 'move_right',
+            'ArrowDown_press': 'move_down',
+            'ArrowDown_hold': 'move_down',
+
             // Personal interaction controls
             'f_press': 'flashlight_off', // Need the press to avoid the press delay
             'f_hold': 'flashlight_off',
