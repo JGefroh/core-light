@@ -41,7 +41,7 @@ const map = {
         // INTRO AREA
         {type: 'TRUCK_CABIN_TOP', xPosition: 490, yPosition: -490, width: 100, height: 80, collision: 'wall', hitscan: true},
         {type: 'TRUCK_CABIN_TOP', xPosition: 130, yPosition: -490, width: 100, height: 80, collision: 'wall', hitscan: true},
-        {type: 'BLOOD_POOL_1', xPosition: 300, yPosition: -250, width: 50, height: 50, collision: 'wall', angleDegrees: 'random'},
+        {type: 'BLOOD_POOL_1', xPosition: 300, yPosition: -250, width: 50, height: 50, angleDegrees: 'random'},
 
         // Intro - Right Truck Zone
         {type: 'CONE_TOP', xPosition: 430, yPosition: -450, width: 20, height: 20, angleDegrees: 'random', collision: 'wall'}, // box
