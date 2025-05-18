@@ -3,7 +3,7 @@ import { default as Core } from '@core/core';
 import { default as Entity } from '@core/entity.js';
 import '@core/tag';
 
-import '@game/title/asset-loader.js';
+import '@game/title/font-loader.js';
 
 import AttachedComponent from '@game/engine/attachments/attached-component';
 import CollisionComponent from '@game/engine/collision/collision-component';

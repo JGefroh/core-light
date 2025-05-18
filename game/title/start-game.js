@@ -2,7 +2,7 @@ import '@core/component';
 import Core from '@core/core';
 import '@core/tag';
 
-import '@game/title/asset-loader.js';
+import '@game/title/font-loader.js';
 
 import { createTestData } from '@game/title/test-data.js';
 
@@ -81,8 +81,8 @@ import PlayerDeathFxSystem from '../features/death-fx/player-death-fx-system';
 import EnemyDeathFxSystem from '../features/death-fx/enemy-death-fx-system';
 import LaserAimSystem from '../features/laser-aim/laser-aim-system';
 import AiStateInformerSystem from '../features/ai/informers/ai-state-informer-system';
-import MapGeneratorSystem from '../genre/top-down/map-generator/map-generator-system';
-import PropGeneratorSystem from '@game/genre/top-down/prop-generator/prop-generator-system';
+import MapGeneratorSystem from '@game/engine/generators/map-generator-system';
+import PropGeneratorSystem from '@game/engine/generators/prop-generator-system';
 import EnemyGeneratorSystem from '../features/enemy-generator/enemy-generator-system';
 import DamageSystem from '../genre/combat/damage-system';
 import Damageable from '../genre/combat/damageable-tag';
@@ -90,7 +90,7 @@ import RifleReloadSystem from '../features/weapons/rifle-reload-system';
 import InstructionSystem from '../features/instructions/instructions-system';
 import GameOverSystem from '../features/game-over/game-over-system';
 import TextureSystem from '../engine/renderer/texture-system';
-import AssetLoaderSystem from '../specifics/configuration/asset-loader-system';
+import AssetLoaderSystem from '@game/specifics/configuration/assets/asset-loader-system';
 
 export function startGame() {
 
@@ -184,10 +184,10 @@ export function startGame() {
     Core.addSystem(new LaserAimSystem());
 
     // Assets
-    Core.addSystem(new PropGeneratorSystem());
-    Core.addSystem(new AssetLoaderSystem());
     Core.addSystem(new EnemyGeneratorSystem())
+    Core.addSystem(new PropGeneratorSystem());
     Core.addSystem(new MapGeneratorSystem())
+    Core.addSystem(new AssetLoaderSystem());
 
     Core.addSystem(new DamageSystem());
         Core.addTag(Damageable);

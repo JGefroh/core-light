@@ -22,7 +22,7 @@ function defineCanvas() {
     offScreenCanvas.height = window.innerHeight;
 }
 
-import '@game/title/asset-loader.js';
+import '@game/title/font-loader.js';
 
 setTimeout(() => {
     defineCanvas();

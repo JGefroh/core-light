@@ -9,13 +9,13 @@ import RenderComponent from '@game/engine/renderer/render-component';
 import HitscanTargetComponent from '@game/engine/hitscan/hitscan-target-component';
 import LightSourceComponent from '@game/engine/lighting/light-source-component';
 
-import { default as mapWarehouse } from './maps/map-warehouse';
-
-
 export default class MapGeneratorSystem extends System {
     constructor() {
         super()
-        this.loadMap(mapWarehouse);
+
+        this.addHandler('LOAD_MAP', (map) => {
+            this.loadMap(map);
+        })
     }
 
     work() {
