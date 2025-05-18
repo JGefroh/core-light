@@ -25,6 +25,7 @@ export default class EnemyDeathFxSystem extends System {
 
     executeEnemyDeath(entity, xPosition, yPosition, angleDegrees) {
         this._dropBody(entity);
+        this._showBlood(entity, xPosition, yPosition);
         this._playAudio(entity, xPosition, yPosition);
     }
 
@@ -51,6 +52,12 @@ export default class EnemyDeathFxSystem extends System {
         corpseEntity.addComponent(render);
         corpseEntity.addComponent(entity.getComponent('PositionComponent'));
         this._core.addEntity(corpseEntity)
+    }
+
+    _showBlood(entity, xPosition, yPosition) {
+        let number = this._getRandomFrom([1,2,3,4])
+        let size = 24 + Math.random() * 20;
+        this.send('CREATE_PROP', {type: `BLOOD_POOL_${number}`, xPosition: xPosition, yPosition: yPosition, width: size, height: size, angleDegrees: 'random'},)
     }
 
     _getRandomFrom(collection) {
