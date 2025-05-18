@@ -9,7 +9,6 @@ import RenderComponent from '@game/engine/renderer/render-component';
 import HitscanTargetComponent from '@game/engine/hitscan/hitscan-target-component';
 import LightSourceComponent from '@game/engine/lighting/light-source-component';
 
-import { default as cardboardBox } from './props/cardboard-box';
 import { default as pallet } from './props/pallet';
 import { default as metalShelfTop } from './props/metal-shelf-top';
 import { default as metalShelfFront } from './props/metal-shelf-front';
@@ -28,6 +27,10 @@ export default class PropGeneratorSystem extends System {
         this.addHandler('CREATE_PROP', (payload) => {
             this.createProp(payload)
         });
+
+        this.addHandler('DEFINE_PROP', (payload) => {
+            this.defineProp(payload);
+        });
     }
 
     work() {
@@ -35,7 +38,8 @@ export default class PropGeneratorSystem extends System {
 
     createProp(propRequest) {
         if (!this.propMap[propRequest.type]) {
-            console.warn(`PropGeneratorSystem: Unknown prop - ${propRequest.type}`);
+            console.warn(`PropGeneratorSystem: Unknown prop - ${propRequest.type}, retrying in 1000ms...`);
+            setTimeout(() => {this.createProp(propRequest)}, 1000)
             return;
         }
     
@@ -128,7 +132,6 @@ export default class PropGeneratorSystem extends System {
             imagePath: imageKey
         }))
         this._core.addEntity(entity);
-        console.info(entity)
     }
 
     _createShadowProp(xPosition, yPosition, width, height, angleDegrees, options) {
@@ -191,7 +194,6 @@ export default class PropGeneratorSystem extends System {
     definePropMap() {
         this.propMap = {};
 
-        this.defineProp(cardboardBox);
         this.defineProp(pallet);
         this.defineProp(metalShelfTop);
         this.defineProp(coneTop);

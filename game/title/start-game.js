@@ -90,7 +90,7 @@ import RifleReloadSystem from '../features/weapons/rifle-reload-system';
 import InstructionSystem from '../features/instructions/instructions-system';
 import GameOverSystem from '../features/game-over/game-over-system';
 import TextureSystem from '../engine/renderer/texture-system';
-import TextureLoaderSystem from '../specifics/configuration/texture-loader-system';
+import AssetLoaderSystem from '../specifics/configuration/asset-loader-system';
 
 export function startGame() {
 
@@ -98,7 +98,6 @@ export function startGame() {
     Core.addSystem(new RenderSystem())
         Core.addSystem(new RenderablesRenderSystem())
         Core.addSystem(new TextureSystem());
-        Core.addSystem(new TextureLoaderSystem());
     Core.addSystem(new ParticleSystem());
         Core.addTag(ParticleEmitter);
     Core.addSystem(new ViewportSystem());
@@ -183,7 +182,10 @@ export function startGame() {
     Core.addSystem(new PlayerDeathFxSystem());
     Core.addSystem(new EnemyDeathFxSystem());
     Core.addSystem(new LaserAimSystem());
+
+    // Assets
     Core.addSystem(new PropGeneratorSystem());
+    Core.addSystem(new AssetLoaderSystem());
     Core.addSystem(new EnemyGeneratorSystem())
     Core.addSystem(new MapGeneratorSystem())
 
