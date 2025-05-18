@@ -24,6 +24,7 @@ import LightSourceComponent from '@game/engine/lighting/light-source-component';
  * To create a prop after defining it:
  * ...send a CREATE_PROP request:
  *      {type: 'BLOOD_POOL', xPosition: 436, yPosition: -373, width: 20, height: 20, angleDegrees: 'random', collision: 'wall', shadow: true, hitscan: true}
+ * ...RANDOM: you can randomize from a selection of sequenced props (eg. BLOOD_POOL_1, BLOOD_POOL_2) by sending a type postfixed with _RANDOM (eg. `BLOOD_POOL_RANDOM`)
  * 
  * When definin a prop with an image, it ties into the Asset and Texture pipeline. 
  * ...The `type` is a developer-defined key for that prop. 
@@ -50,15 +51,16 @@ export default class PropGeneratorSystem extends System {
     }
 
     createProp(propRequest) {
-        if (!this.propMap[propRequest.type]) {
-            console.warn(`PropGeneratorSystem: Unknown prop - ${propRequest.type}, retrying in 1000ms...`);
+        let propRequestType = this._getRandomKeyIfRequestForRandomProp(propRequest.type)
+        if (!this.propMap[propRequestType]) {
+            console.warn(`PropGeneratorSystem: Unknown prop - ${propRequestType}, retrying in 1000ms...`);
             setTimeout(() => {this.createProp(propRequest)}, 1000)
             return;
         }
     
         let propAngle = propRequest.angleDegrees === 'random' ? Math.random() * 360 : propRequest.angleDegrees || 0;
     
-        const propDetails = this.propMap[propRequest.type];
+        const propDetails = this.propMap[propRequestType];
     
         if (propRequest.shadow || propRequest.collision) {
             this._createShadowProp(
@@ -202,6 +204,24 @@ export default class PropGeneratorSystem extends System {
             borderSize: options.borderSize != null ? options.borderSize : (borderColor ? 1.5 : 0)
         }))
         this._core.addEntity(entity);
+    }
+
+    _getRandomKeyIfRequestForRandomProp(key) {
+        const RANDOM_SUFFIX = 'RANDOM';
+    
+        if (!key.endsWith(RANDOM_SUFFIX)) {
+            return key;
+        }
+    
+        const prefix = key.slice(0, -RANDOM_SUFFIX.length);
+        const matchingKeys = Object.keys(this.propMap).filter(k => k.startsWith(prefix));
+    
+        if (matchingKeys.length === 0) {
+            return key;
+        }
+    
+        const randomIndex = Math.floor(Math.random() * matchingKeys.length);
+        return matchingKeys[randomIndex];
     }
 
     defineProp(propDefinition) {
