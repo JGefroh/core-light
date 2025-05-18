@@ -62,115 +62,119 @@ export default class LightSystem extends System {
         if (lightable.getRays().length > 0 && lightable.getLightRefresh() == 'static') {
             return;
         }
+
+        if (lightable.getLightType() === 'self') {
+            this._calculateRaysForSelfIllumination(lightable);
+            return;
+        }
+
+        let params = this._getParametersForLightType(lightable);
+        
+        const rays = [];
+        const renderable = this.getTag('Renderable');
+    
+        for (let i = 0; i < params.rayCount; i++) {
+            let angle = params.startAngle + (i / (params.rayCount - 1)) * (params.endAngle - params.startAngle);
+            angle = (angle + this.TWO_PI) % (this.TWO_PI);
+            const index = Math.floor((angle % (this.TWO_PI)) / this.ANGLE_STEP);
+
+            let results = this._castRay(lightable.getXPosition(), lightable.getYPosition(), this.COS[index], this.SIN[index], lightable.getMaxDistance(), renderable, lightable)
+    
+            rays.push({x: results.x, y: results.y, angle: angle});
+        }
+    
+        lightable.setRays(rays);
+    }
+    
+    
+    _castRay(sourceX, sourceY, destinationX, destinationY, maxDistance, renderable, lightable) {
+        let intersections = [];
+    
+        this.workForTag('Shadowable', (shadowable, entity) => {
+            if (shadowable.getEntity() === lightable.getEntity()) return;
+            
+            renderable.setEntity(entity);
+
+            let edges = this._getCacheEdges(shadowable, renderable);
+
+            for (const [p1, p2] of edges) {
+                const hit = this._rayIntersectSegment(sourceX, sourceY, destinationX, destinationY, p1, p2);
+                if (hit && hit.distance <= maxDistance) {
+                    intersections.push(hit);
+                }
+            }
+        });
+
+        intersections.sort((a, b) => a.distance - b.distance);
+
+        let finalX = sourceX + destinationX * maxDistance;
+        let finalY = sourceY + destinationY * maxDistance;
+
+        if (intersections.length >= 2) {
+            const second = intersections[1];
+            const backNudge = this._calculateDirectionNudge(-destinationX, -destinationY, 0.1);
+            finalX = second.x + backNudge.x;
+            finalY = second.y + backNudge.y;
+        }
+
+        return {x: finalX, y: finalY};
+    }
+
+    _getCacheEdges(shadowable, renderable) {
+        let edges = shadowable.getRectangleEdgesCache();
+        if (!edges) {
+            edges = this._getRectangleEdges(renderable)
+            shadowable.setRectangleEdgesCache(edges)
+        }
+        return edges;
+    }
+
+    _calculateRaysForSelfIllumination(lightable) {
         const sourceX = lightable.getXPosition();
         const sourceY = lightable.getYPosition();
-        const maxDistance = lightable.getMaxDistance();
-        let rayCount = Math.floor(400);
-    
-        let startAngle = 0;
-        let endAngle = this.TWO_PI;
-    
+        const renderable = this.getTag('Renderable');
+        renderable.setEntity(lightable.getEntity());
+
+        const padding = lightable.getPadding();
+        const rotation = lightable.getAngleDegrees() || 0;
+
+        const edges = this._getRectangleEdges(renderable, rotation);
+        const rays = [];
+
+        for (const [p1, _] of edges) {
+            const dx = p1.x - sourceX;
+            const dy = p1.y - sourceY;
+            const dist = Math.hypot(dx, dy);
+            const scale = (dist + padding) / dist || 1;
+
+            rays.push({
+                x: sourceX + dx * scale,
+                y: sourceY + dy * scale,
+                angle: Math.atan2(dy, dx)
+            });
+        }
+
+        lightable.setRays(rays);
+    }
+
+    _getParametersForLightType(lightable) {
         if (lightable.getLightType() === 'cone') {
-            rayCount = lightable.getConeDegrees() + 100
-            const angleRadians = (lightable.getAngleDegrees() % 360) * (Math.PI / 180);
-            const coneRadians = (lightable.getConeDegrees() / 2) * (Math.PI / 180);
+            const angleRadians = lightable.getAngleDegrees() * Math.PI / 180;
+            const coneRadians = lightable.getConeDegrees() * Math.PI / 360;
     
-            startAngle = (angleRadians - coneRadians + Math.PI * 2) % (Math.PI * 2);
-            endAngle = (angleRadians + coneRadians + Math.PI * 2) % (Math.PI * 2);
+            let startAngle = (angleRadians - coneRadians) % this.TWO_PI;
+            let endAngle = (angleRadians + coneRadians) % this.TWO_PI;
     
             if (endAngle < startAngle) {
                 endAngle += this.TWO_PI;
             }
+
+            let rayCount = lightable.getConeDegrees() + 100
+            return {rayCount: rayCount, startAngle: startAngle, endAngle: endAngle};
         }
-        else if (lightable.getLightType() === 'self') {
-            const renderable = this.getTag('Renderable');
-            renderable.setEntity(lightable.getEntity());
-
-            const padding = lightable.getPadding();
-            const rotation = lightable.getAngleDegrees() || 0;
-
-            const edges = this._getRectangleEdges(renderable, rotation);
-            const rays = [];
-
-            for (const [p1, _] of edges) {
-                const dx = p1.x - sourceX;
-                const dy = p1.y - sourceY;
-                const dist = Math.hypot(dx, dy);
-                const scale = (dist + padding) / dist || 1;
-
-                rays.push({
-                    x: sourceX + dx * scale,
-                    y: sourceY + dy * scale,
-                    angle: Math.atan2(dy, dx)
-                });
-            }
-
-            lightable.setRays(rays);
-            return;
+        else {
+            return {rayCount: Math.floor(400), startAngle: 0, endAngle: this.TWO_PI};
         }
-    
-        const rays = [];
-        const renderable = this.getTag('Renderable');
-    
-        for (let i = 0; i < rayCount; i++) {
-            const fraction = i / (rayCount - 1);
-            let angle = startAngle + fraction * (endAngle - startAngle);
-            angle = (angle + this.TWO_PI) % (this.TWO_PI);
-    
-
-            const index = Math.floor((angle % (this.TWO_PI)) / this.ANGLE_STEP);
-            const dx = this.COS[index]
-            const dy = this.SIN[index]
-    
-            let intersections = [];
-    
-            this.workForTag('Shadowable', (shadowable, entity) => {
-                if (shadowable.getEntity() === lightable.getEntity()) return;
-    
-                
-                renderable.setEntity(entity);
-                const shadowX = renderable.getXPosition();
-                const shadowY = renderable.getYPosition();
-
-                const dxs = shadowX - sourceX;
-                const dys = shadowY - sourceY;
-                const distSq = dxs * dxs + dys * dys;
-
-                let edges = shadowable.getRectangleEdgesCache()
-                if (!edges) {
-                    shadowable.setRectangleEdgesCache(this._getRectangleEdges(renderable))
-                    edges = shadowable.getRectangleEdgesCache()
-                }
-    
-                for (const [p1, p2] of edges) {
-                    const hit = this._rayIntersectSegment(sourceX, sourceY, dx, dy, p1, p2);
-                    if (hit && hit.distance <= maxDistance) {
-                        intersections.push(hit);
-                    }
-                }
-            });
-    
-            intersections.sort((a, b) => a.distance - b.distance);
-    
-            let finalX = sourceX + dx * maxDistance;
-            let finalY = sourceY + dy * maxDistance;
-    
-            // ⬇️ Use second intersection, not the first
-            if (intersections.length >= 2) {
-                const second = intersections[1];
-                const backNudge = this._calculateDirectionNudge(-dx, -dy, 0.1);
-                finalX = second.x + backNudge.x;
-                finalY = second.y + backNudge.y;
-            }
-    
-            rays.push({
-                x: finalX,
-                y: finalY,
-                angle: angle
-            });
-        }
-    
-        lightable.setRays(rays);
     }
 
     /////
