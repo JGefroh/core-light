@@ -9,16 +9,16 @@ import RenderComponent from '@game/engine/renderer/render-component';
 import HitscanTargetComponent from '@game/engine/hitscan/hitscan-target-component';
 import LightSourceComponent from '@game/engine/lighting/light-source-component';
 
-import { default as mapWarehouse } from '../map-generator/maps/map-warehouse';
-
 import { default as cardboardBox } from './props/cardboard-box';
 import { default as pallet } from './props/pallet';
 import { default as metalShelfTop } from './props/metal-shelf-top';
+import { default as metalShelfFront } from './props/metal-shelf-front';
 import { default as coneTop } from './props/cone-top';
 import { default as converyorBeltTop } from './props/conveyor-belt-top';
 import { default as lightFixture } from './props/light-fixture';
 import { default as floorPaintCaution } from './props/floor-paint-caution';
 import { default as metalVentTop } from './props/metal-vent-top';
+
 
 
 export default class PropGeneratorSystem extends System {
@@ -53,46 +53,82 @@ export default class PropGeneratorSystem extends System {
                 propRequest
             );
         }
-    
-        propDetails.parts.forEach((part) => {
-            const scaleX = propRequest.width / propDetails.width;
-            const scaleY = propRequest.height / propDetails.height;
-    
-            const globalAngleRad = propAngle * Math.PI / 180;
-            const partAngleRad = (part.angleDegrees || 0) * Math.PI / 180;
-            const totalAngleRad = globalAngleRad + partAngleRad;
-    
-            const cosA = Math.cos(globalAngleRad);
-            const sinA = Math.sin(globalAngleRad);
-    
-            // Scale local position
-            const localX = part.x * scaleX;
-            const localY = part.y * scaleY;
-    
-            // Rotate local position around (0,0) using only global rotation
-            const rotatedX = localX * cosA - localY * sinA;
-            const rotatedY = localX * sinA + localY * cosA;
-    
-            // Translate to final world position
-            const finalX = propRequest.xPosition + rotatedX;
-            const finalY = propRequest.yPosition + rotatedY;
-    
-            // Scale dimensions
-            const scaledWidth = part.width * scaleX;
-            const scaledHeight = part.height * scaleY;
-    
-            // Create the part using full part + prop rotation
-            this._createPropPart(
-                part.shape,
-                finalX,
-                finalY,
-                scaledWidth,
-                scaledHeight,
-                totalAngleRad * 180 / Math.PI,
-                part.color,
-                part
-            );
-        });
+
+        if (propDetails.parts) {
+            propDetails.parts.forEach((part) => {
+                const scaleX = propRequest.width / propDetails.width;
+                const scaleY = propRequest.height / propDetails.height;
+        
+                const globalAngleRad = propAngle * Math.PI / 180;
+                const partAngleRad = (part.angleDegrees || 0) * Math.PI / 180;
+                const totalAngleRad = globalAngleRad + partAngleRad;
+        
+                const cosA = Math.cos(globalAngleRad);
+                const sinA = Math.sin(globalAngleRad);
+        
+                // Scale local position
+                const localX = part.x * scaleX;
+                const localY = part.y * scaleY;
+        
+                // Rotate local position around (0,0) using only global rotation
+                const rotatedX = localX * cosA - localY * sinA;
+                const rotatedY = localX * sinA + localY * cosA;
+        
+                // Translate to final world position
+                const finalX = propRequest.xPosition + rotatedX;
+                const finalY = propRequest.yPosition + rotatedY;
+        
+                // Scale dimensions
+                const scaledWidth = part.width * scaleX;
+                const scaledHeight = part.height * scaleY;
+        
+                // Create the part using full part + prop rotation
+                this._createPropPart(
+                    part.shape,
+                    finalX,
+                    finalY,
+                    scaledWidth,
+                    scaledHeight,
+                    totalAngleRad * 180 / Math.PI,
+                    part.color,
+                    part
+                );
+            });
+        }
+        else if (propDetails.imageKey) {
+            this._createPropImage(
+                propDetails.imageKey,
+                propRequest.xPosition,
+                propRequest.yPosition,
+                propRequest.width,
+                propRequest.height,
+                propRequest.angleDegrees || 0
+            );   
+        }
+    }
+
+    _createPropImage(imageKey, xPosition, yPosition, width, height, angleDegrees) {
+        let entity = new Entity()
+
+        entity.addComponent(new PositionComponent(
+            {
+                width: width,
+                height: height,
+                xPosition: xPosition,
+                yPosition: yPosition,
+                angleDegrees: angleDegrees
+            }
+        ));
+        entity.addComponent(new RenderComponent({
+            width: width,
+            height: height,
+            shape: 'rectangle',
+            shapeColor: 'rgba(0,0,0,0)',
+            renderLayer: 'PROP',
+            imagePath: imageKey
+        }))
+        this._core.addEntity(entity);
+        console.info(entity)
     }
 
     _createShadowProp(xPosition, yPosition, width, height, angleDegrees, options) {
@@ -163,6 +199,7 @@ export default class PropGeneratorSystem extends System {
         this.defineProp(lightFixture);
         this.defineProp(floorPaintCaution);
         this.defineProp(metalVentTop);
+        this.defineProp(metalShelfFront);
     }
 
     defineProp(propDefinition) {

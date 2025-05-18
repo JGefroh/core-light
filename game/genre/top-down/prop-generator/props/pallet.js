@@ -2,6 +2,7 @@ const prop = {
     type: 'PALLET',
     width: 140,
     height: 140,
+    imageKey: 'PALLET',
     parts: [
         // Vertical base beams (beneath slats)
         { x: -40, y: 0, width: 20, height: 100, color: '#3B2618' },
