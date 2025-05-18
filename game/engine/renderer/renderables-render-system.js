@@ -60,7 +60,7 @@ export default class RenderablesRenderSystem extends System {
       if (renderable.getShape() == 'path') {
         this._renderAsPath(canvasCtx, viewport, renderer, renderable)
       }
-      else if (this.renderMode == 'shape') {
+      else if (!renderable.getImagePath()) {
         this._renderAsShape(canvasCtx, viewport, renderer, renderable)
       }
       else if (renderable.getImagePath()) {
@@ -97,13 +97,19 @@ export default class RenderablesRenderSystem extends System {
     }
 
     _renderAsImage(canvasCtx, viewport, renderer, renderable) {
-      let img = this._getCachedImage(renderable)
-      let imageWidth = renderable.getWidth();
-      let imageHeight = renderable.getHeight();
-      let xPosition = renderable.getXPosition()
-      let yPosition = renderable.getYPosition()
+      let shape = renderable.getShape()
+      let shapeWidth = renderable.getWidth();
+      let shapeHeight = renderable.getHeight();
+      let xPosition = renderable.getXPosition();
+      let yPosition = renderable.getYPosition();
+      let imagePath = renderable.getImagePath();
+      let options = renderable.getOptions();
+      options.imagePath = imagePath;
 
-      renderer.drawImage(canvasCtx, viewport, img, imageWidth, imageHeight, xPosition, yPosition)
+      renderer.drawShape(canvasCtx, viewport, shape, shapeWidth, shapeHeight, xPosition, yPosition,
+      renderable.getAngleDegrees(), 
+      renderable.getShapeColor(),
+      options)
     }
 
     _renderAsPath(renderCtx, viewport, renderer, renderable) {
@@ -121,17 +127,5 @@ export default class RenderablesRenderSystem extends System {
             ]
         }
     );
-    }
-
-    _getCachedImage(renderable) {
-      let img = renderable.getImageObject()
-      
-      if (!img) {
-        img = new Image()
-        img.src = renderable.getImagePath();
-        renderable.setImageObject(img)
-      }
-
-      return img
     }
 }

@@ -46,7 +46,8 @@ function addPlayer(x, y) {
         shapeColor: 'rgba(107, 142, 35, 1)',
         borderColor: 'rgba(12, 12, 14, 1)',
         borderSize: 1.5,
-        renderLayer: 'CHARACTER'
+        renderLayer: 'CHARACTER',
+        
     });
     entity.addComponent(position);
     entity.addComponent(render)

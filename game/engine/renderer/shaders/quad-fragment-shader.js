@@ -8,6 +8,11 @@ const fragmentSourceCode = `#version 300 es
   in vec2 v_instanceScale;
   in vec4 v_scale;
 
+  // Textures
+  in vec2 v_texCoord;
+  uniform sampler2D u_texture0;
+
+
   out vec4 o_color;
 
     
@@ -16,31 +21,27 @@ const fragmentSourceCode = `#version 300 es
   } 
     
   void main() {
-    // Normalize localPosition from [-0.5, 0.5] to [0.0, 1.0]
-    vec2 uv = v_localPosition + vec2(0.5);
+    bool hasTexture = any(greaterThan(v_texCoord, vec2(0.001)));
 
-    // Compute how close this fragment is to the nearest edge
-    vec2 edgeDist = min(uv, 1.0 - uv);
+    if (hasTexture) {
+      // Sample the texture only, no extra effects
+      o_color = texture(u_texture0, v_texCoord);
+    } else {
+      // Normalize localPosition from [-0.5, 0.5] to [0.0, 1.0]
+      vec2 uv = v_localPosition + vec2(0.5);
+      vec2 edgeDist = min(uv, 1.0 - uv);
 
-    // Border condition: is this pixel inside the border band?
-    // Size of border in UV units
-    float relativeBorderX = v_borderSize / v_instanceScale.x;
-    float relativeBorderY = v_borderSize / v_instanceScale.y;
+      float relativeBorderX = v_borderSize / v_instanceScale.x;
+      float relativeBorderY = v_borderSize / v_instanceScale.y;
+      bool isBorder = (edgeDist.x < relativeBorderX) || (edgeDist.y < relativeBorderY);
 
-    // Border test
-    bool isBorder = (edgeDist.x < relativeBorderX) || (edgeDist.y < relativeBorderY);
-
-    // Mix border color and fill color
-    if (isBorder) {
-      o_color = v_borderColor;
-    }
-    else {
-      float noise = random(uv * 32.0); // controls frequency
-
-      vec3 baseColor = v_color.rgb;
-      vec3 noisyColor = baseColor * (0.9 + 0.2 * noise); // subtle variation
-
-      o_color = vec4(noisyColor, v_color.a);
+      if (isBorder) {
+        o_color = v_borderColor;
+      } else {
+        float noise = random(uv * 32.0);
+        vec3 noisyColor = v_color.rgb * (0.9 + 0.2 * noise);
+        o_color = vec4(noisyColor, v_color.a);
+      }
     }
   }
   `;

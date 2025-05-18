@@ -17,6 +17,7 @@ export default class WebGl2Renderer {
     this.buffers = {}
     this.flushIndex = 0;
     this.flushCountMax = 60;
+    this.textureDetails = null;
 
     this.programNameByShapeName = {
       'rectangle': 'QUAD',
@@ -55,9 +56,9 @@ export default class WebGl2Renderer {
   }
 
   loadTexture(renderCtx, textureDetails) {
-    console.info(textureDetails)
     const texture = renderCtx.createTexture();
     renderCtx.bindTexture(renderCtx.TEXTURE_2D, texture);
+    textureDetails.texture = texture;
 
     renderCtx.texImage2D(
       renderCtx.TEXTURE_2D,
@@ -72,6 +73,8 @@ export default class WebGl2Renderer {
     renderCtx.texParameteri(renderCtx.TEXTURE_2D, renderCtx.TEXTURE_WRAP_T, renderCtx.CLAMP_TO_EDGE);
     renderCtx.texParameteri(renderCtx.TEXTURE_2D, renderCtx.TEXTURE_MIN_FILTER, renderCtx.NEAREST);
     renderCtx.texParameteri(renderCtx.TEXTURE_2D, renderCtx.TEXTURE_MAG_FILTER, renderCtx.NEAREST);
+
+    this.textureDetails = textureDetails; //TODO: Make this support multiple textures when the need eventually arises.
   }
 
   clearScreen(renderCtx, clearScreenColor) {
@@ -94,7 +97,6 @@ export default class WebGl2Renderer {
     this.perFrameCache['lastDrawnShape'] = null;
 
     this.flushCalls = 0;
-
   }
 
   forceDraw(renderCtx, viewport) {
@@ -110,12 +112,15 @@ export default class WebGl2Renderer {
   }
 
   drawShape(renderCtx, viewport, shape, shapeWidth, shapeHeight, xPosition, yPosition, angleDegrees, color, options = {}) {
+    if (options.imagePath) {
+      options.textureUVBounds = this._getTextureUVBounds(options.imagePath);
+    }
     this._ensureInstanceBufferForShape(shape)
     this._pushToBuffer(shape, shapeWidth, shapeHeight, xPosition, yPosition, angleDegrees, color, options);
   }
 
-  drawImage(renderCtx, viewport, img, imageWidth, imageHeight, xPosition, yPosition) {
-    //no-op for now
+  drawImage(renderCtx, viewport, img, imageWidth, imageHeight, xPosition, yPosition, angleDegrees, color, options = {}) {
+    // no-op, the WebGL2 renderer uses drawShape with an imagePath option keyed on the texture atlas
   }
 
   drawPath(renderCtx, viewport, xPosition, yPosition, pathPoints, pathColor, {
@@ -195,7 +200,8 @@ export default class WebGl2Renderer {
       angles: [],
       scales: [],
       borderSizes: [],
-      borderColors: []
+      borderColors: [],
+      textureUVBounds: [],
     }
   }
 
@@ -216,8 +222,32 @@ export default class WebGl2Renderer {
 
     this.perFrameCache['instanceBuffers'][shape].borderSizes.push(options.borderSize || 0.0);
 
+    this.perFrameCache['instanceBuffers'][shape].textureUVBounds.push(
+      ...(options.textureUVBounds || [0, 0, 0, 0]) // [0,0,0,0] will be ignored by the fragment shader
+    );
+
     const borderColorObject = this.colorUtil.colorToRaw(options.borderColor || 'rgba(0,0,0,0)', 255);
     this.perFrameCache['instanceBuffers'][shape].borderColors.push(...[borderColorObject.r, borderColorObject.g, borderColorObject.b, borderColorObject.a]);
+  }
+
+  _getTextureUVBounds(imagePath) {
+    let image = this.textureDetails.images[imagePath]
+
+    if (!image) {
+      return null; // Can't find image.
+    }
+
+    if (!image.uv) {
+      // Calculate and cache UV
+      const u0 = image.atlasXPosition / this.textureDetails.width;
+      const v0 = image.atlasYPosition / this.textureDetails.height;
+      const u1 = (image.atlasXPosition + image.width) / this.textureDetails.width;
+      const v1 = (image.atlasYPosition + image.height) / this.textureDetails.height;
+  
+      image.uv = [u0, v0, u1, v1];
+    }
+
+    return image.uv
   }
 
   _getFlushIndex() {
@@ -237,6 +267,13 @@ export default class WebGl2Renderer {
     let programName = this.programNameByShapeName[shape] || 'QUAD'
     const program = this.programs[programName];
     renderCtx.useProgram(program.program);
+
+    // Set up textures if any are loaded.
+    if (this.textureDetails) {
+      renderCtx.activeTexture(renderCtx.TEXTURE0);
+      renderCtx.bindTexture(renderCtx.TEXTURE_2D, this.textureDetails.texture);
+      renderCtx.uniform1i(renderCtx.getUniformLocation(program.program, 'u_texture0'), 0);
+    }
 
     let index = this._getFlushIndex();
     const vao = this.vertexArrayObjects[`${programName}_${index}`];
@@ -259,6 +296,9 @@ export default class WebGl2Renderer {
     // Borders
     this._bindToBufferIfExists(renderCtx, `${programName}_INSTANCE_BORDER_SIZE_${index}`, instanceBuffersForShape.borderSizes)
     this._bindToBufferIfExists(renderCtx, `${programName}_INSTANCE_BORDER_COLOR_${index}`, instanceBuffersForShape.borderColors)
+
+    // Textures
+    this._bindToBufferIfExists(renderCtx, `${programName}_INSTANCE_TEXTURE_UV_BOUNDS_${index}`, instanceBuffersForShape.textureUVBounds)
 
     renderCtx.drawArraysInstanced(renderCtx.TRIANGLES, 0, 6, instanceCount);
 
@@ -297,7 +337,7 @@ export default class WebGl2Renderer {
       program: program,
       attributes: {},
       uniforms: {
-        u_projectionMatrix: renderCtx.getUniformLocation(program, 'u_projectionMatrix')
+        u_projectionMatrix: renderCtx.getUniformLocation(program, 'u_projectionMatrix'),
       }
     }
   }
@@ -464,6 +504,14 @@ export default class WebGl2Renderer {
         renderCtx.enableVertexAttribArray(locBorderColor);
         renderCtx.vertexAttribPointer(locBorderColor, 4, renderCtx.FLOAT, false, 0, 0);
         renderCtx.vertexAttribDivisor(locBorderColor, 1); // per-instance
+      })
+      
+      // === Per-instance UV for a texture (vec4) ===
+      this.initializeBuffersFor(renderCtx, `${programType}_INSTANCE_TEXTURE_UV_BOUNDS`, this.maxBufferSize * 2, renderCtx.DYNAMIC_DRAW, index, () => {
+        const locTextureUV = renderCtx.getAttribLocation(program.program, 'a_instanceTextureUvBounds');
+        renderCtx.enableVertexAttribArray(locTextureUV);
+        renderCtx.vertexAttribPointer(locTextureUV, 4, renderCtx.FLOAT, false, 0, 0);
+        renderCtx.vertexAttribDivisor(locTextureUV, 1); // per-instance
       })
 
       // Clean up

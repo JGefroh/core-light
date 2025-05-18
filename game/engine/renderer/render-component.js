@@ -6,8 +6,7 @@ export default class RenderComponent extends Component {
         this.componentType = 'RenderComponent'
         this.width = payload.width;
         this.height = payload.height;
-        this.imagePath = payload.imagePath || '/assets/images/dev-no-texture.jpg'
-        this.imageObject = null;
+        this.imagePath = payload.imagePath;
         this.angleDegrees = payload.angleDegrees; // This is used for visual angles, and not position-based logic.
 
         this.renderLayer = payload.renderLayer || 'TOP'
