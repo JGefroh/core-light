@@ -4,6 +4,10 @@ const manifest = {
     },
     props: {
         'METAL_SHELF_FRONT': { path: 'prop-shelf-front.png' },
+        'BLOOD_POOL_1': { path: 'blood-pool-1.png' },
+        'BLOOD_POOL_2': { path: 'blood-pool-2.png' },
+        'BLOOD_POOL_3': { path: 'blood-pool-3.png' },
+        'BLOOD_POOL_4': { path: 'blood-pool-4.png' },
         'TRUCK_CABIN_TOP': { path: 'truck-cabin-top.png' },
         'PROP_CARDBOARD_BOX': { path: 'prop-cardboard-box.json' },
         'PROP_CONE_TOP': { path: 'prop-cone-top.json' },

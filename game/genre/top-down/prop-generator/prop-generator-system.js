@@ -96,7 +96,7 @@ export default class PropGeneratorSystem extends System {
                 propRequest.yPosition,
                 propRequest.width,
                 propRequest.height,
-                propRequest.angleDegrees || 0
+                propAngle|| 0
             );   
         }
     }
