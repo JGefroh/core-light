@@ -7,6 +7,9 @@ const map = {
         {xPosition: 130, yPosition: -295, width: 60, height: 5, color: '#1A1A1A' }, // truck entry
         // INTRO AREA
         {xPosition: 310, yPosition: -450, width: 300, height: 300, color: '#1A1A1A' },
+        {xPosition: 490, yPosition: -560, width: 75, height: 75, color: '#1A1A1A' },
+        {xPosition: 130, yPosition: -560, width: 75, height: 75, color: '#1A1A1A' },
+
     ],
     walls: [
         {from: [0,0], to: [0, -300]},
@@ -26,14 +29,17 @@ const map = {
         {offset: [0, -90]},
 
         // INTRO AREA
-        {from: [160, -449], to: [160, -600]},
-        {offset: [300, 0]},
+        {from: [90, -449], to: [90, -600]},
+        {offset: [440, 0]},
         {offset: [0, 150]},
     ],
     props: [
         {type: 'METAL_SHELF_TOP', xPosition: 130, yPosition: -100, width: 40, height: 150, shadow: true, collision: 'wall', hitscan: true }, //shelf
         {type: 'FLOOR_PAINT_CAUTION', xPosition: 80, yPosition: -270, width: 100, height: 80, },
         {type: 'FLOOR_PAINT_CAUTION', xPosition: 440, yPosition: -270, width: 100, height: 80, },
+
+        {type: 'TRUCK_CABIN_TOP', xPosition: 490, yPosition: -490, width: 100, height: 80, collision: 'wall', hitscan: true},
+        {type: 'TRUCK_CABIN_TOP', xPosition: 130, yPosition: -490, width: 100, height: 80, collision: 'wall', hitscan: true},
 
         {type: 'CARDBOARD_BOX', xPosition: 130, yPosition: -80, width: 20, height: 20, angleDegrees: 45, angleDegrees: 'random' }, // box
         {type: 'CARDBOARD_BOX', xPosition: 130, yPosition: -120, width: 20, height: 20, angleDegrees: 98 }, // box

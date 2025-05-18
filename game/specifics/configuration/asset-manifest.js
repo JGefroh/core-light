@@ -4,6 +4,7 @@ const manifest = {
     },
     props: {
         'METAL_SHELF_FRONT': { path: 'prop-shelf-front.png' },
+        'TRUCK_CABIN_TOP': { path: 'truck-cabin-top.png' },
         'PROP_CARDBOARD_BOX': { path: 'prop-cardboard-box.json' },
         'PROP_CONE_TOP': { path: 'prop-cone-top.json' },
         'PROP_CONVEYOR_BELT_TOP': { path: 'prop-conveyor-belt-top.json' },
