@@ -9,6 +9,29 @@ import RenderComponent from '@game/engine/renderer/render-component';
 import HitscanTargetComponent from '@game/engine/hitscan/hitscan-target-component';
 import LightSourceComponent from '@game/engine/lighting/light-source-component';
 
+/**
+ * This system generates props at a specific location.
+ * Props are pre-defined objects.
+ * 
+ * You can define a pop with an image or a sequence of Renderables.
+ * 
+ * To define a prop:
+ * ...via image: 
+ *      {type: 'BLOOD_POOL', imageKey: 'BLOOD_POOL_2}
+ * ...via sequence of Renderables: 
+ *      { "type": "LIGHT_FIXTURE", "width": 80, "height": 40, "parts": [{"x":-20,"y":0,"width":40,"height":40,"shape":"rect","color":"#2C2C2C"}, ...and so on]}
+ * 
+ * To create a prop after defining it:
+ * ...send a CREATE_PROP request:
+ *      {type: 'BLOOD_POOL', xPosition: 436, yPosition: -373, width: 20, height: 20, angleDegrees: 'random', collision: 'wall', shadow: true, hitscan: true}
+ * 
+ * When definin a prop with an image, it ties into the Asset and Texture pipeline. 
+ * ...The `type` is a developer-defined key for that prop. 
+ * ...You can define a prop by passing in an Image key that maps to an Asset:
+ *      Asset: {'BLOOD_POOL_2': { path: 'blood-pool-2.png' } // Defines an image texture with the key 'BLOOD_POOL_2' - accepts .json or images in path.
+ *      Prop:  {type: 'BLOOD_POOL', imageKey: 'BLOOD_POOL_2} // Defines a prop called 'BLOOD_POOL' that uses the image from above.
+ */
+
 export default class PropGeneratorSystem extends System {
     constructor() {
         super()
