@@ -1,0 +1,15 @@
+{
+  "type": "CONVEYOR_BELT_TOP",
+  "width": 160,
+  "height": 40,
+  "parts": [
+    {"x":0,"y":0,"width":160,"height":40,"shape":"rect","color":"#2D2D2D"},
+    {"x":-78,"y":0,"width":4,"height":40,"shape":"rect","color":"#444444"},
+    {"x":78,"y":0,"width":4,"height":40,"shape":"rect","color":"#444444"},
+    {"x":-60,"y":0,"width":6,"height":40,"shape":"rect","color":"#555555"},
+    {"x":-30,"y":0,"width":6,"height":40,"shape":"rect","color":"#555555"},
+    {"x":0,"y":0,"width":6,"height":40,"shape":"rect","color":"#555555"},
+    {"x":30,"y":0,"width":6,"height":40,"shape":"rect","color":"#555555"},
+    {"x":60,"y":0,"width":6,"height":40,"shape":"rect","color":"#555555"}
+  ]
+}

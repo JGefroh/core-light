@@ -38,12 +38,25 @@ export default class AssetLoaderSystem extends System {
     }
 
     async loadProps(props) {
-      let onlyJson = Object.entries(props).filter(([key, value]) => value.path.endsWith('.json'))
-      for (const [key, value] of onlyJson) { 
-        let propDefinition = await fetch(`/assets/images/${value.path}`).then((response) => {
-          return response.json();
-        });
-        this.send('DEFINE_PROP', propDefinition)
-      };
+      for (const [key, value] of Object.entries(props)) {
+        if (value.path.endsWith('.json')) {
+          let propDefinition = await fetch(`/assets/images/${value.path}`).then((response) => {
+            return response.json();
+          });
+          this.send('DEFINE_PROP', propDefinition)
+        }
+        else {
+          let propDefinition = {type: key, imageKey: key}
+          this.send('DEFINE_PROP', propDefinition)
+        }
+      }
+      // let onlyJson = Object.entries(props).filter(([key, value]) => value.path.endsWith('.json'))
+      // for (const [key, value] of onlyJson) { 
+      //   let propDefinition = await fetch(`/assets/images/${value.path}`).then((response) => {
+      //     return response.json();
+      //   });
+      //   this.send('DEFINE_PROP', propDefinition)
+      // };
+      
     }
 }
