@@ -231,6 +231,9 @@ export default class WebGl2Renderer {
   }
 
   _getTextureUVBounds(imagePath) {
+    if (!this.textureDetails) {
+      return null; // No texture loaded.
+    }
     let image = this.textureDetails.images[imagePath]
 
     if (!image) {
