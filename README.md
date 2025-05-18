@@ -12,6 +12,8 @@ This is not intended to be used in a commercial or production environment - it w
 
 # Screenshots
 
+![output](https://github.com/user-attachments/assets/9513d7c9-8bd9-4998-abe1-a3272aa0598b)
+
 <img width="2043" src="https://github.com/JGefroh/core-light/blob/main/static/screenshots/screenshot-1.jpg">
 <img width="2037" src="https://github.com/JGefroh/core-light/blob/main/static/screenshots/screenshot-2.jpg">
 
