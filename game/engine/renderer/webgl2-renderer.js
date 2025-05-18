@@ -48,11 +48,30 @@ export default class WebGl2Renderer {
   drawCanvasLayer(renderCtx, layer) {
   }
 
-
   saveContext(renderCtx) {
   }
 
   restoreContext(renderCtx) {
+  }
+
+  loadTexture(renderCtx, textureDetails) {
+    console.info(textureDetails)
+    const texture = renderCtx.createTexture();
+    renderCtx.bindTexture(renderCtx.TEXTURE_2D, texture);
+
+    renderCtx.texImage2D(
+      renderCtx.TEXTURE_2D,
+      0,
+      renderCtx.RGBA,
+      renderCtx.RGBA,
+      renderCtx.UNSIGNED_BYTE,
+      textureDetails.atlasImage
+    );
+
+    renderCtx.texParameteri(renderCtx.TEXTURE_2D, renderCtx.TEXTURE_WRAP_S, renderCtx.CLAMP_TO_EDGE);
+    renderCtx.texParameteri(renderCtx.TEXTURE_2D, renderCtx.TEXTURE_WRAP_T, renderCtx.CLAMP_TO_EDGE);
+    renderCtx.texParameteri(renderCtx.TEXTURE_2D, renderCtx.TEXTURE_MIN_FILTER, renderCtx.NEAREST);
+    renderCtx.texParameteri(renderCtx.TEXTURE_2D, renderCtx.TEXTURE_MAG_FILTER, renderCtx.NEAREST);
   }
 
   clearScreen(renderCtx, clearScreenColor) {

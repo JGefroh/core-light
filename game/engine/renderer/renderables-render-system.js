@@ -8,14 +8,24 @@ export default class RenderablesRenderSystem extends System {
       // Rules around render stack fo Renderables
       this.renderMode = 'shape'
       this.renderablesLayerOrder = ['TERRAIN', 'LOWER_DECOR', 'WALL', 'PROP', 'CHARACTER_DECOR_LOWER', 'CHARACTER', 'UPPER_DECOR', 'TOP']
+      this.renderer = null;
+      this.canvasCtx = null;
     }
 
     initialize() {
       this.send("REGISTER_RENDER_LAYER", {
         layer: 'RENDERABLES',
         layerRenderLibrary: 'webgl2', //webgl2 or 2d (canvas)
-        render: this._render.bind(this)
+        render: this._render.bind(this),
+        onInitialize: (renderer, canvasCtx) => {
+          this.renderer = renderer;
+          this.canvasCtx = canvasCtx;
+        }
       })
+
+      this.addHandler('LOAD_TEXTURE_TO_RENDERER', (textureDetails) => {
+        this.renderer.loadTexture(this.canvasCtx, textureDetails)
+      });
     }
 
     _render(renderOptions) {

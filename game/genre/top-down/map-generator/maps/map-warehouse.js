@@ -68,6 +68,7 @@ const map = {
         {type: 'CARDBOARD_BOX', xPosition: 140, yPosition: -420, width: 30, height: 20, angleDegrees: 90, collision: 'wall' }, // box
         {type: 'CARDBOARD_BOX', xPosition: 120, yPosition: -390, width: 20, height: 20, angleDegrees: 90, collision: 'wall' }, // box
         {type: 'CARDBOARD_BOX', xPosition: 140, yPosition: -390, width: 20, height: 20, angleDegrees: 90, collision: 'wall' }, // box
+        {type: 'METAL_VENT_TOP', xPosition: 620, yPosition: -270, width: 16, height: 32, collision: 'wall' },
     ],
     lights: [
         {xPosition: 15, yPosition: -300, type: 'cone', radius: 300, angleDegrees: 45, coneDegrees: 50},

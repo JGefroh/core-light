@@ -18,6 +18,7 @@ import { default as coneTop } from './props/cone-top';
 import { default as converyorBeltTop } from './props/conveyor-belt-top';
 import { default as lightFixture } from './props/light-fixture';
 import { default as floorPaintCaution } from './props/floor-paint-caution';
+import { default as metalVentTop } from './props/metal-vent-top';
 
 
 export default class PropGeneratorSystem extends System {
@@ -161,6 +162,7 @@ export default class PropGeneratorSystem extends System {
         this.defineProp(converyorBeltTop);
         this.defineProp(lightFixture);
         this.defineProp(floorPaintCaution);
+        this.defineProp(metalVentTop);
     }
 
     defineProp(propDefinition) {

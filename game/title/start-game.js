@@ -89,12 +89,16 @@ import Damageable from '../genre/combat/damageable-tag';
 import RifleReloadSystem from '../features/weapons/rifle-reload-system';
 import InstructionSystem from '../features/instructions/instructions-system';
 import GameOverSystem from '../features/game-over/game-over-system';
+import TextureSystem from '../engine/renderer/texture-system';
+import TextureLoaderSystem from '../specifics/configuration/texture-loader-system';
 
 export function startGame() {
 
     // General mechanics systems
     Core.addSystem(new RenderSystem())
         Core.addSystem(new RenderablesRenderSystem())
+        Core.addSystem(new TextureSystem());
+        Core.addSystem(new TextureLoaderSystem());
     Core.addSystem(new ParticleSystem());
         Core.addTag(ParticleEmitter);
     Core.addSystem(new ViewportSystem());

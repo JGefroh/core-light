@@ -29,6 +29,10 @@ export default class CanvasRenderer extends System {
         // no-op
     }
 
+    loadTexture(texture) {
+        // no-op
+    }
+
     clearScreen(renderCtx, clearScreenColor) {
         renderCtx.save()
         renderCtx.clearRect(0, 0, renderCtx.canvas.width, renderCtx.canvas.height);

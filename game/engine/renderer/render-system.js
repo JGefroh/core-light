@@ -57,6 +57,10 @@ export default class RenderSystem extends System {
         renderer: renderer,
         applyOptions: payload.applyOptions || {}
       })
+
+      if (payload.onInitialize) {
+        payload.onInitialize(renderer, layerCanvasCtx); // Callback hook so other systems can perform renderer initialization
+      }
     }
 
     _ensureLayerCanvasAvailable(layerKey, layerRenderLibrary) {
