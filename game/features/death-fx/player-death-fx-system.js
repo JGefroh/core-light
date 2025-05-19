@@ -38,6 +38,7 @@ export default class PlayerDeathFxSystem extends System {
         this._playAudio(xPosition, yPosition)
         this._showGore(xPosition, yPosition, 60)
         this._showGore(xPosition, yPosition, 60, true)
+        this._showBlood(xPosition, yPosition)
         this._dropBody(entity);
         this._core.removeEntity(entity)
         this._showGameOver();
@@ -128,6 +129,11 @@ export default class PlayerDeathFxSystem extends System {
 
             this._core.addEntity(entity);
         }
+    }
+
+    _showBlood(xPosition, yPosition) {
+        let size = 24 + Math.random() * 20;
+        this.send('CREATE_PROP', {type: `BLOOD_POOL_RANDOM`, xPosition: xPosition, yPosition: yPosition, width: size, height: size, angleDegrees: 'random'})
     }
 
     _createPlayerFlashlight(x, y, angleDegrees) {
