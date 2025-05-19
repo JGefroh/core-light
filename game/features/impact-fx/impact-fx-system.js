@@ -27,7 +27,7 @@ export default class ImpactFxSystem extends System {
 
         this.workForEntityWithTag(payload.entity?.id, 'Material', (entity, tag) => {
             if (tag.getMaterialType() == 'flesh') {
-                const hits = Math.floor(Math.random() * 12) + 20;
+                const hits = Math.floor(Math.random() * 12) + 10;
                 hasMaterial = true;
                 for (let i = 0; i < hits; i++) {
                     this.generateBulletPersonHitGiblets(payload.entity, payload.xPosition, payload.yPosition, payload.angleDegrees, true)
@@ -80,8 +80,8 @@ export default class ImpactFxSystem extends System {
         let randomMagnitude = Math.random() * 10
         let spread = detonate ? 360 : 20; // degrees
         let randomAngle = angleDegrees + (Math.random() * spread - spread / 2);
-        let width = Math.random() * 8
-        let height = Math.random() * 4;
+        let width = 2 + Math.random() * 8
+        let height = 2 + Math.random() * 4;
         let color = this._randomFrom([
             '#8B0000', // dark red
             '#A10000',
@@ -89,6 +89,12 @@ export default class ImpactFxSystem extends System {
             '#5C0A0A'  // dried blood
         ]);
 
+        let meatChunk = this._randomFrom([
+            'MEAT_CHUNK_1',
+            'MEAT_CHUNK_2',
+            'MEAT_CHUNK_3',
+            'MEAT_CHUNK_4',
+        ])
         let entity = new Entity()
         entity.addComponent(new PositionComponent(
             {
@@ -102,8 +108,9 @@ export default class ImpactFxSystem extends System {
         entity.addComponent(new RenderComponent({
             width: width,
             height: height,
-            shape: 'blob',
+            shape: 'rectangle',
             shapeColor: color,
+            imagePath: meatChunk,
             renderLayer: 'PROP'
         }))
         // entity.addComponent(new TimerComponent({

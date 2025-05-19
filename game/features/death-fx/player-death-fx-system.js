@@ -95,6 +95,12 @@ export default class PlayerDeathFxSystem extends System {
                 '#B22222',
                 '#5C0A0A'  // dried blood
             ]);
+            let meatChunk = this._randomFrom([
+                'MEAT_CHUNK_1',
+                'MEAT_CHUNK_2',
+                'MEAT_CHUNK_3',
+                'MEAT_CHUNK_4',
+            ])
             if (green) {
                 color = this._randomFrom([
                     '#556B2F', // dark olive green
@@ -117,8 +123,9 @@ export default class PlayerDeathFxSystem extends System {
             entity.addComponent(new RenderComponent({
                 width: width,
                 height: height,
-                shape: 'blob',
+                shape: 'rectangle',
                 shapeColor: color,
+                imagePath: meatChunk,
                 renderLayer: 'LOWER_DECOR'
             }))
             let vectorComponent = new VectorComponent({
