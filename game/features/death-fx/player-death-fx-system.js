@@ -108,6 +108,11 @@ export default class PlayerDeathFxSystem extends System {
                     '#7A9E38', // slightly brighter/lusher
                     '#3C4F1A'  // deep forest / muted
                 ]);
+                meatChunk = null;
+            }
+            else {
+                width += 2;
+                height += 2;
             }
 
             let entity = new Entity()
