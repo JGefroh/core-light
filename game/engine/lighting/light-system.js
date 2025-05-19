@@ -74,59 +74,23 @@ export default class LightSystem extends System {
         const renderable = this.getTag('Renderable');
     
         for (let i = 0; i < params.rayCount; i++) {
-            let angle = params.startAngle + (i / (params.rayCount - 1)) * (params.endAngle - params.startAngle);
-            angle = (angle + this.TWO_PI) % (this.TWO_PI);
-            const index = Math.floor((angle % (this.TWO_PI)) / this.ANGLE_STEP);
+            let angle = this._generateRayAngle(i, params.rayCount, params.startAngle, params.endAngle);
+            const cacheIndex = Math.floor((angle % (this.TWO_PI)) / this.ANGLE_STEP);
 
-            let results = this._castRay(lightable.getXPosition(), lightable.getYPosition(), this.COS[index], this.SIN[index], lightable.getMaxDistance(), renderable, lightable)
+            let results = this._castRay(lightable.getXPosition(), lightable.getYPosition(), this.COS[cacheIndex], this.SIN[cacheIndex], lightable.getMaxDistance(), renderable, lightable)
     
-            rays.push({x: results.x, y: results.y, angle: angle});
+            rays.push({
+                x: results.x, 
+                y: results.y, 
+                angle: angle
+            });
         }
     
         lightable.setRays(rays);
     }
-    
-    
-    _castRay(sourceX, sourceY, destinationX, destinationY, maxDistance, renderable, lightable) {
-        let intersections = [];
-    
-        this.workForTag('Shadowable', (shadowable, entity) => {
-            if (shadowable.getEntity() === lightable.getEntity()) return;
-            
-            renderable.setEntity(entity);
 
-            let edges = this._getCacheEdges(shadowable, renderable);
-
-            for (const [p1, p2] of edges) {
-                const hit = this._rayIntersectSegment(sourceX, sourceY, destinationX, destinationY, p1, p2);
-                if (hit && hit.distance <= maxDistance) {
-                    intersections.push(hit);
-                }
-            }
-        });
-
-        intersections.sort((a, b) => a.distance - b.distance);
-
-        let finalX = sourceX + destinationX * maxDistance;
-        let finalY = sourceY + destinationY * maxDistance;
-
-        if (intersections.length >= 2) {
-            const second = intersections[1];
-            const backNudge = this._calculateDirectionNudge(-destinationX, -destinationY, 0.1);
-            finalX = second.x + backNudge.x;
-            finalY = second.y + backNudge.y;
-        }
-
-        return {x: finalX, y: finalY};
-    }
-
-    _getCacheEdges(shadowable, renderable) {
-        let edges = shadowable.getRectangleEdgesCache();
-        if (!edges) {
-            edges = this._getRectangleEdges(renderable)
-            shadowable.setRectangleEdgesCache(edges)
-        }
-        return edges;
+    _getConsistentJitter(lightable, index, jitterAmount = 0.01) {
+        return ((((lightable.getXPosition() * 73856093 + lightable.getYPosition() * 19349663 + index * 83492791) % 1000) / 1000) - 0.5) * 2 * jitterAmount;
     }
 
     _calculateRaysForSelfIllumination(lightable) {
@@ -155,6 +119,53 @@ export default class LightSystem extends System {
         }
 
         lightable.setRays(rays);
+    }
+
+    _generateRayAngle(i, rayCount, startAngle, endAngle) {
+        let angle = startAngle + (i / (rayCount - 1)) * (endAngle - startAngle);
+        return (angle + this.TWO_PI) % (this.TWO_PI);
+    }
+    
+    _castRay(sourceX, sourceY, destinationX, destinationY, maxDistance, renderable, lightable) {
+        let intersections = [];
+    
+        this.workForTag('Shadowable', (shadowable, entity) => {
+            if (shadowable.getEntity() === lightable.getEntity()) return;
+            
+            renderable.setEntity(entity);
+
+            let edges = this._getCacheEdges(shadowable, renderable);
+
+            for (const [edgePoint1, edgePoint2] of edges) {
+                const hit = this._rayIntersectSegment(sourceX, sourceY, destinationX, destinationY, edgePoint1, edgePoint2);
+                if (hit && hit.distance <= maxDistance) {
+                    intersections.push(hit);
+                }
+            }
+        });
+
+        intersections.sort((a, b) => a.distance - b.distance);
+
+        let finalX = sourceX + destinationX * maxDistance;
+        let finalY = sourceY + destinationY * maxDistance;
+
+        if (intersections.length >= 2) {
+            const second = intersections[1];
+            const backNudge = this._calculateDirectionNudge(-destinationX, -destinationY, 0.1);
+            finalX = second.x + backNudge.x;
+            finalY = second.y + backNudge.y;
+        }
+
+        return {x: finalX, y: finalY};
+    }
+
+    _getCacheEdges(shadowable, renderable) {
+        let edges = shadowable.getRectangleEdgesCache();
+        if (!edges) {
+            edges = this._getRectangleEdges(renderable)
+            shadowable.setRectangleEdgesCache(edges)
+        }
+        return edges;
     }
 
     _getParametersForLightType(lightable) {
@@ -198,12 +209,6 @@ export default class LightSystem extends System {
             }
         );
     }
-
-    /////
-    // Shadows
-    /////
-
-
 
     ////
     // Helpers
@@ -251,26 +256,31 @@ export default class LightSystem extends System {
             [worldCorners[3], worldCorners[0]]
         ];
     }
-    _rayIntersectSegment(x0, y0, dx, dy, p1, p2) {
-        const x1 = p1.x, y1 = p1.y;
-        const x2 = p2.x, y2 = p2.y;
+
+    _rayIntersectSegment(rayOriginX, rayOriginY, rayDirectionX, rayDirectionY, edgePoint1, edgePoint2) {
+        const segmentDeltaX = edgePoint2.x - edgePoint1.x;
+        const segmentDeltaY = edgePoint2.y - edgePoint1.y;
     
-        const rx = dx;
-        const ry = dy;
-        const sx = x2 - x1;
-        const sy = y2 - y1;
+        const denominator = rayDirectionX * segmentDeltaY - rayDirectionY * segmentDeltaX;
+        if (denominator === 0) {
+            // Lines are parallel; no intersection
+            return null;
+        }
     
-        const denominator = rx * sy - ry * sx;
-        if (denominator === 0) return null; // Parallel
+        const originToSegmentX = edgePoint1.x - rayOriginX;
+        const originToSegmentY = edgePoint1.y - rayOriginY;
     
-        const t = ((x1 - x0) * sy - (y1 - y0) * sx) / denominator;
-        const u = ((x1 - x0) * ry - (y1 - y0) * rx) / denominator;
+        const rayDistanceFactor = (originToSegmentX * segmentDeltaY - originToSegmentY * segmentDeltaX) / denominator;
+        const segmentIntersectionFactor = (originToSegmentX * rayDirectionY - originToSegmentY * rayDirectionX) / denominator;
     
-        if (t >= 0 && u >= 0 && u <= 1) {
+        const isIntersectionOnRay = rayDistanceFactor >= 0;
+        const isIntersectionOnSegment = segmentIntersectionFactor >= 0 && segmentIntersectionFactor <= 1;
+    
+        if (isIntersectionOnRay && isIntersectionOnSegment) {
             return {
-                x: x0 + t * rx,
-                y: y0 + t * ry,
-                distance: t
+                x: rayOriginX + rayDistanceFactor * rayDirectionX,
+                y: rayOriginY + rayDistanceFactor * rayDirectionY,
+                distance: rayDistanceFactor
             };
         }
     
@@ -286,10 +296,5 @@ export default class LightSystem extends System {
             y: (dy / length) * amount
         };
     }
-
-
-    ////
-    // DEBUG
-    /// 
 } 
 
