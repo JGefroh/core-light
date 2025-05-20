@@ -4,6 +4,7 @@ export default class Entity {
     this.dirty = false;
     this.id = payload.id;
     this.key = payload.key;
+    this.type = payload.type;
     this.destroy = false;
   }
 
@@ -29,6 +30,14 @@ export default class Entity {
 
   getKey() {
     return this.key;
+  }
+
+  getType() {
+    return this.type;
+  }
+
+  setType(type) {
+    this.type = type;
   }
 
   listComponents() {

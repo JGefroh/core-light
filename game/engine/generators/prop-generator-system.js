@@ -127,7 +127,7 @@ export default class PropGeneratorSystem extends System {
     }
 
     _createPropImage(imageKey, xPosition, yPosition, width, height, angleDegrees) {
-        let entity = new Entity()
+        let entity = new Entity({type: imageKey})
 
         entity.addComponent(new PositionComponent(
             {

@@ -91,6 +91,9 @@ import GameOverSystem from '../features/game-over/game-over-system';
 import TextureSystem from '../engine/renderer/texture-system';
 import AssetLoaderSystem from '@game/engine/assets/asset-loader-system';
 import AssetConfigurationSystem from '../specifics/configuration/assets/asset-configuration-system';
+import LogicConfigurationSystem from '../specifics/configuration/logic/logic-configuration-system';
+import LogicSystem from '../engine/logic/logic-system';
+import HasLogic from '../engine/logic/has-logic';
 
 export function startGame() {
 
@@ -129,6 +132,11 @@ export function startGame() {
     // Input
     Core.addSystem(new InputSystem())
         Core.addSystem(new MouseTrackerSystem());
+
+    // Per-entity logic
+    Core.addSystem(new LogicSystem());
+        Core.addTag(HasLogic)
+
 
     // Extras
     Core.addSystem(new ParticleSystem());
@@ -211,8 +219,9 @@ export function startGame() {
     // Game Specific Configuration
     Core.addSystem(new InputConfigurationSystem());
     Core.addSystem(new CollisionConfigurationSystem());
-    Core.addSystem(new AssetConfigurationSystem());
     Core.addSystem(new AiConfigurationSystem())
+    Core.addSystem(new LogicConfigurationSystem());
+    Core.addSystem(new AssetConfigurationSystem()); // Must go after logic
 
 
     //Debug

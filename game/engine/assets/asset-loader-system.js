@@ -19,7 +19,7 @@ export default class AssetLoaderSystem extends System {
         ...this._removeJsonDefinitions(assetManifest.props)
       };
       
-      this.loadTextures(combinedTextures)
+      this.loadTextures(combinedTextures);
       this.loadProps(assetManifest.props);
     }
 

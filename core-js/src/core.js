@@ -17,7 +17,7 @@ class Core {
     this.entitiesById[entity.getId()] = entity;
     this.entitiesByKey[entity.getKey()] = entity;
     this.updateTags(entity);
-    this.send("DEBUG_DATA", {type: 'entity_added', entity: entity})
+    this.send("CORE_ENTITY_CREATED", {type: entity.type, entity: entity})
   }
 
   isTracked(entity) {
