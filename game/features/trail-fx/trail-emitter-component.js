@@ -7,7 +7,7 @@ export default class TrailEmitterComponent extends Component {
 
         this.trailLength = payload.trailLength || 10;
         this.lastTrailTimestamp = Date.now()
-        this.trailFrequencyMs = 500;
+        this.trailFrequencyMs = payload.trailFrequencyMs || 500;
 
         // Properties of current trail
         this.trailRemaining = payload.trailRemaining || 0;

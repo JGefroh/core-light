@@ -9,6 +9,7 @@ import RenderComponent from '@game/engine/renderer/render-component';
 import AiComponent from '@game/engine/ai/ai-component';
 import MaterialComponent from '@game/engine/material/material-component';
 import HealthComponent from '../../genre/combat/health-component';
+import TrailEmitterComponent from '../trail-fx/trail-emitter-component';
 
 
 export default class EnemyGeneratorSystem extends System {
@@ -106,6 +107,10 @@ export default class EnemyGeneratorSystem extends System {
         entity.addComponent(new AiComponent({
             goal: 'goal_attack'
         }));
+        entity.addComponent(new TrailEmitterComponent({
+            trailFrequencyMs: enemyType.indexOf('fast') == -1 ? 1500 : 500
+        }));
+
         entity.addComponent(new HealthComponent({
             health: health,
             onHealthZero: (entity, health) => {

@@ -44,11 +44,16 @@ export default class TrailSystem extends System {
         if (!trailEmitter.didPositionChange()) {
           return;
         }
+        let angleRadians = (trailEmitter.getAngleDegrees() * Math.PI) / 180;
+        let xPositionLocal = (0);
+        let yPositionLocal = (trailEmitter.getTrailRemaining() % 2 == 0 ? -8 : 8);
+        let xPositionOffset = xPositionLocal * Math.cos(angleRadians) - yPositionLocal * Math.sin(angleRadians);
+        let yPositionOffset = xPositionLocal * Math.sin(angleRadians) + yPositionLocal * Math.cos(angleRadians);
 
         this.send('CREATE_PROP', {
           type: trailEmitter.getTrailRemaining() % 2 == 0 ? 'BLOODY_BOOTPRINT_LEFT' : 'BLOODY_BOOTPRINT_RIGHT', 
-          xPosition: trailEmitter.getXPosition() + (trailEmitter.trailRemaining % 2 == 0 ? 2 : -2) , 
-          yPosition: trailEmitter.getYPosition() + (trailEmitter.trailRemaining % 2 == 0 ? 2 : -2) , 
+          xPosition: trailEmitter.getXPosition() + xPositionOffset, 
+          yPosition: trailEmitter.getYPosition() + yPositionOffset, 
           width: 4, 
           height: 16, 
           angleDegrees: trailEmitter.getAngleDegrees() + 90
