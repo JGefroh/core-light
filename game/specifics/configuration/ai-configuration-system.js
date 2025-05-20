@@ -1,11 +1,11 @@
 import { default as System } from '@core/system';
 
 import AiComponent from '@game/engine/ai/ai-component';
-import { GoalAttack } from './goals/goal-attack';
-import { TacticAttack } from './tactics/tactic-attack';
-import { ActionMoveTowardsTarget } from './actions/action-move-towards-target';
-import { StepTurnTowardsTarget } from './steps/step-turn-towards-target';
-import { StepMoveTowardsTarget } from './steps/step-move-towards-target';
+import { GoalAttack } from '../../features/ai/goals/goal-attack';
+import { TacticAttack } from '../../features/ai/tactics/tactic-attack';
+import { ActionMoveTowardsTarget } from '../../features/ai/actions/action-move-towards-target';
+import { StepTurnTowardsTarget } from '../../features/ai/steps/step-turn-towards-target';
+import { StepMoveTowardsTarget } from '../../features/ai/steps/step-move-towards-target';
 
 export default class AiConfigurationSystem extends System {
     constructor() {

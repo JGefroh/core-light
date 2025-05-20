@@ -1,23 +1,18 @@
 import { default as System } from '@core/system';
-import { default as assetManifest} from './asset-manifest.js'
-import { default as mapWarehouse } from '@game/specifics/maps/map-warehouse';
 
 export default class AssetLoaderSystem extends System {
     constructor(config = {}) {
       super()
-      this._loadAssets();
-      this._loadMap();
-      
+
+      this.addHandler('LOAD_ASSETS', (payload) => {
+        this._loadAssets(payload.assetManifest);
+      });
     }
   
     work() {
     };
 
-    _loadMap() {
-      this.send('LOAD_MAP', mapWarehouse);
-    }
-
-    _loadAssets() {
+    _loadAssets(assetManifest) {
       // Textures are flat images, but also have images.
       const combinedTextures = {
         ...assetManifest.textures,

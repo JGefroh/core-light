@@ -8,14 +8,19 @@ export default class LightSystem extends System {
     }
 
     initialize() {
-        this.send("REGISTER_RENDER_LAYER", {
-            layer: 'LIGHTING',
-            layerRenderLibrary: 'webgl2', // 2d is interestingly faster than canvas
-            applyOptions: {
-                globalCompositeOperation: 'multiply',
-            },
-            render: this._render.bind(this)
-        })
+
+        
+        if (window.location.href.indexOf('nolight') == -1) {
+            this.send("REGISTER_RENDER_LAYER", {
+                layer: 'LIGHTING',
+                layerRenderLibrary: 'webgl2', // 2d is interestingly faster than canvas
+                applyOptions: {
+                    globalCompositeOperation: 'multiply',
+                },
+                render: this._render.bind(this)
+            })
+        }
+        
 
         this._initializeTrigCache();
     }
@@ -32,8 +37,6 @@ export default class LightSystem extends System {
     }
 
     work() {
-        this.workForTag('Lightable', (lightable, entity) => {
-        })
     }
 
     _render(renderOptions) {

@@ -48,7 +48,6 @@ import TurnsTowards from '@game/features/turn-towards-cursor/turns-towards-tag';
 // Tags
 import Lightable from '@game/engine/lighting/lightable-tag';
 import Movable from '@game/engine/movement/movement-tags';
-import Animatable from '@game/engine/renderer/animatable-tag';
 import Renderable from '@game/engine/renderer/render-tags';
 import Timer from '@game/engine/timer/timer-tag';
 
@@ -74,7 +73,7 @@ import ParticleEmitter from '../engine/particle/particle-emitter-tag';
 import Material from '../engine/material/material-tag';
 import AiSystem from '@game/engine/ai/ai-system';
 import Ai from '../engine/ai/ai-tag';
-import AiConfigurationSystem from '../features/ai/ai-configuration-system';
+import AiConfigurationSystem from '../specifics/configuration/ai-configuration-system';
 import DistanceTrackerSystem from '../engine/tracker/distance-tracker-system';
 import DistanceTrack from '../engine/tracker/distance-track-tag';
 import PlayerDeathFxSystem from '../features/death-fx/player-death-fx-system';
@@ -90,72 +89,88 @@ import RifleReloadSystem from '../features/weapons/rifle-reload-system';
 import InstructionSystem from '../features/instructions/instructions-system';
 import GameOverSystem from '../features/game-over/game-over-system';
 import TextureSystem from '../engine/renderer/texture-system';
-import AssetLoaderSystem from '@game/specifics/configuration/assets/asset-loader-system';
+import AssetLoaderSystem from '@game/engine/assets/asset-loader-system';
+import AssetConfigurationSystem from '../specifics/configuration/assets/asset-configuration-system';
 
 export function startGame() {
 
-    // General mechanics systems
+    ////
+    // Generic systems
+    ////
+    // Rendering
     Core.addSystem(new RenderSystem())
+        Core.addTag(Renderable)
         Core.addSystem(new RenderablesRenderSystem())
         Core.addSystem(new TextureSystem());
-    Core.addSystem(new ParticleSystem());
-        Core.addTag(ParticleEmitter);
-    Core.addSystem(new ViewportSystem());
-    if (window.location.href.indexOf('nolight') == -1) {
-        Core.addSystem(new LightSystem())
-    }
+
+
+    // GUI
     Core.addSystem(new GuiSystem())
-    Core.addSystem(new InputSystem())
+        Core.addTag(GuiCanvasRenderable)
+
+    // Loaders and Gnerators
+    Core.addSystem(new AssetLoaderSystem());
+        Core.addSystem(new PropGeneratorSystem());
+        Core.addSystem(new MapGeneratorSystem());
+
+    // Camera
+    Core.addSystem(new ViewportSystem());
+        Core.addTag(ViewportFollowable)
+
+    // Audio
     Core.addSystem(new AudioSystem());
         Core.addTag(AudioListener);
-    Core.addSystem(new MouseTrackerSystem());
-    Core.addSystem(new TimerSystem());
 
-    // Movement
-    Core.addSystem(new MovementProposalSystem());
-    Core.addSystem(new DistanceTrackerSystem());
-        Core.addTag(DistanceTrack);
-    Core.addSystem(new CollisionSystem());
-        Core.addSystem(new CollisionConfigurationSystem());
-        Core.addTag(Collidable);
-    Core.addSystem(new MovementFinalizationSystem());
-    Core.addSystem(new AttachmentSyncSystem())
+    //Lighting
+    Core.addSystem(new LightSystem())
+        Core.addTag(Lightable)
+        Core.addTag(Shadowable)
+
+    // Input
+    Core.addSystem(new InputSystem())
+        Core.addSystem(new MouseTrackerSystem());
+
+    // Extras
+    Core.addSystem(new ParticleSystem());
+        Core.addTag(ParticleEmitter);
     
 
-    //Debug
-    if (window.location.href.indexOf('debug') != -1) {
-        Core.addSystem(new DebugUiSystem());
+    // Movement and attached object syncing [ordering matters here]
+    Core.addSystem(new MovementProposalSystem());
+        Core.addTag(Movable);
+        Core.addSystem(new DistanceTrackerSystem());
+            Core.addTag(DistanceTrack);
+        Core.addSystem(new CollisionSystem());
+            Core.addTag(Collidable);
+    Core.addSystem(new MovementFinalizationSystem());
+    Core.addSystem(new AttachmentSyncSystem())
+        Core.addTag(Attached)
+    
 
-    }
-
-
-    //Gameplay
-    Core.addSystem(new InputConfigurationSystem())
-    Core.addSystem(new TurnsTowardsSystem());
 
     // Ambience
-
+    
+    // Utilities
+    Core.addSystem(new TimerSystem());
+        Core.addTag(Timer);
 
     // Generic tags
-    Core.addTag(Renderable)
-    Core.addTag(GuiCanvasRenderable)
-    Core.addTag(Animatable)
-    Core.addTag(Lightable)
-    Core.addTag(Shadowable)
-    Core.addTag(Timer);
-    Core.addTag(Movable);
     Core.addTag(Cursorable);
-    Core.addTag(Attached)
-    Core.addTag(ViewportFollowable)
 
-    // Specific game tags
-    Core.addTag(TurnsTowards);
 
+    ////
+    // Features
+    ////
+
+    //Gameplay
+    Core.addSystem(new TurnsTowardsSystem());
+        Core.addTag(TurnsTowards);
+
+    // AI and Enemies
     Core.addSystem(new AiSystem());
         Core.addTag(Ai);
-    Core.addSystem(new AiConfigurationSystem())
     Core.addSystem(new AiStateInformerSystem())
-
+    Core.addSystem(new EnemyGeneratorSystem())
 
     // Player Control (firing, moving)
     Core.addSystem(new PlayerControlMovementSystem())
@@ -163,7 +178,7 @@ export function startGame() {
         Core.addSystem(new PlayerControlWeaponSystem())
         Core.addSystem(new PlayerControlFlashlightSystem());
 
-    // Weeapons
+    // Combat and weapons
     Core.addSystem(new WeaponFiringSystem())
         Core.addSystem(new RifleFiringSystem())
         Core.addSystem(new RifleReloadSystem())
@@ -172,27 +187,36 @@ export function startGame() {
         Core.addTag(Weapon);
     Core.addSystem(new HitscanSystem());
         Core.addTag(HitscanTarget);
-
-
-    Core.addSystem(new ImpactFxSystem());
-    Core.addSystem(new FootstepFxSystem());
-    Core.addTag(HasFootsteps);
-    Core.addTag(Material);
-
-    Core.addSystem(new PlayerDeathFxSystem());
-    Core.addSystem(new EnemyDeathFxSystem());
-    Core.addSystem(new LaserAimSystem());
-
-    // Assets
-    Core.addSystem(new EnemyGeneratorSystem())
-    Core.addSystem(new PropGeneratorSystem());
-    Core.addSystem(new MapGeneratorSystem())
-    Core.addSystem(new AssetLoaderSystem());
-
     Core.addSystem(new DamageSystem());
         Core.addTag(Damageable);
+    Core.addSystem(new LaserAimSystem());
+
+    // FX
+    Core.addTag(Material);
+    Core.addSystem(new ImpactFxSystem());
+    Core.addSystem(new FootstepFxSystem());
+        Core.addTag(HasFootsteps);
+    Core.addSystem(new PlayerDeathFxSystem());
+    Core.addSystem(new EnemyDeathFxSystem());
+
+    // Game logic and conditions
     Core.addSystem(new InstructionSystem());
     Core.addSystem(new GameOverSystem());
+
+
+    ////
+    // Game-specific configuration
+    ////
+
+    // Game Specific Configuration
+    Core.addSystem(new InputConfigurationSystem());
+    Core.addSystem(new CollisionConfigurationSystem());
+    Core.addSystem(new AssetConfigurationSystem());
+    Core.addSystem(new AiConfigurationSystem())
+
+
+    //Debug
+    Core.addSystem(new DebugUiSystem());
 
 
     Core.start();
