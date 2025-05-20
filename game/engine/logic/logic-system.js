@@ -29,14 +29,14 @@ export default class LogicSystem extends System {
         this.workForTag('HasLogic', (tag) => {
             let rules = tag.getRules();
             rules.forEach((rule) => {
-                if (this._checkRuleConditions(rule)) {
-                    this._executeEffect(rule);
+                if (this._checkRuleConditions(rule, tag.getEntity())) {
+                    this._executeEffect(rule, tag.getEntity());
                 }
             });
         });
     };
 
-    _checkRuleConditions(rule) {
+    _checkRuleConditions(rule, ownerEntity) {
         let conditions = rule.conditions;
         let allTrue = true;
         conditions.forEach((condition) => {
@@ -46,15 +46,15 @@ export default class LogicSystem extends System {
                 return;
             }
 
-            allTrue = allTrue && evaluator.evaluate(params);
+            allTrue = allTrue && evaluator.evaluate(this._core, ownerEntity, params);
         });
 
         return allTrue;
     }
 
-    _executeEffect(rule) {
+    _executeEffect(rule, ownerEntity) {
         rule.effects.forEach((effect) => {
-            this.send(effect.type, effect.params);
+            this.send(effect.type, {entity: ownerEntity, ...effect.params});
         });
     }
 }

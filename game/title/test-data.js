@@ -29,6 +29,9 @@ export function createTestData() {
 
 function addPlayer(x, y) {
     let entity = new Entity({key: 'pc'})
+    
+    entity.addLabel('FootstepTrailFxCapable');
+
     let size = 16;
     let position = new PositionComponent(
         {

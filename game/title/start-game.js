@@ -94,6 +94,9 @@ import AssetConfigurationSystem from '../specifics/configuration/assets/asset-co
 import LogicConfigurationSystem from '../specifics/configuration/logic/logic-configuration-system';
 import LogicSystem from '../engine/logic/logic-system';
 import HasLogic from '../engine/logic/has-logic';
+import TrailSystem from '../features/trail-fx/trail-system';
+import FootstepTrailFxCapable from '../features/trail-fx/footstep-trail-fx-capable-tag';
+import TrailGenerator from '../features/trail-fx/trail-generator-tag';
 
 export function startGame() {
 
@@ -206,6 +209,9 @@ export function startGame() {
         Core.addTag(HasFootsteps);
     Core.addSystem(new PlayerDeathFxSystem());
     Core.addSystem(new EnemyDeathFxSystem());
+    Core.addSystem(new TrailSystem());
+        Core.addTag(FootstepTrailFxCapable);
+        Core.addTag(TrailGenerator);
 
     // Game logic and conditions
     Core.addSystem(new InstructionSystem());
