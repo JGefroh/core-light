@@ -13,6 +13,7 @@ export default class Movable extends Tag{
     };
   
     setXPosition(xPosition) {
+      this.entity.getComponent('PositionComponent').lastXPosition = this.entity.getComponent('PositionComponent').xPosition;
       this.entity.getComponent('PositionComponent').xPosition = xPosition;
     };
   
@@ -21,6 +22,7 @@ export default class Movable extends Tag{
     };
   
     setYPosition(yPosition) {
+      this.entity.getComponent('PositionComponent').lastYPosition = this.entity.getComponent('PositionComponent').yPosition;
       this.entity.getComponent('PositionComponent').yPosition = yPosition;
     };
 

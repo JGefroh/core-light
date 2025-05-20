@@ -1,10 +1,10 @@
-import { default as System } from '@core/system';
 import { default as Core}  from '@core/core';
+import { default as System } from '@core/system';
 import { default as Entity } from '@core/entity.js'
 
-import TrailGeneratorComponent from './trail-generator-component';
+import TrailZoneComponent from './trail-zone-component';
 
-export default class FootstepTrailFxSystem extends System {
+export default class TrailSystem extends System {
     constructor() {
       super()
 
@@ -16,63 +16,60 @@ export default class FootstepTrailFxSystem extends System {
     }
     
     work() {
-        this.workForTag('FootstepTrailFxCapable', (trail) => {
+      this._activateTrailZones();
+      this._createTrails();
+    }
 
-          this.workForTag('TrailGenerator', (trailGenerator) => {
-            let distance = this._calculateDistanceBetween(trail, trailGenerator)
-            if (distance < 40) {
-              this._setShouldCreateTrail(trail);
-            }
-          });
+    _activateTrailZones() {
+      this.workForTag('TrailEmitter', (trailEmitter) => {
+        this.workForTag('TrailZone', (trailZone) => {
+          let distance = this._calculateDistanceBetween(trailEmitter, trailZone)
+          if (distance < 20) {
+            this._setShouldCreateTrail(trailEmitter);
+          }
         });
+      });
     }
 
-    addFootstepTrailFx(entity) {
-        entity.addComponent(new TrailGeneratorComponent());
-    }
+    _createTrails() {
+      this.workForTag('TrailEmitter', (trailEmitter) => {
+        if (trailEmitter.getTrailRemaining() <= 0) {
+          return;
+        }
 
-    _setShouldCreateTrail(trail) {
-      let trailer = this.trailers[trail.getId()];
-      if (trailer?.interval) {
-        clearInterval(trailer.interval);
-      }
+        if (!trailEmitter.isTimeToAddTrail()) {
+          return;
+        }
 
-
-      let interval = setInterval(() => {
-        let trailer = this.trailers[trail.getId()]
-        
-        if (trail.getXPosition() == trailer.lastXPosition && trail.getYPosition() == trailer.lastYPosition) {
-          return; // Entity didn't move.
+        if (!trailEmitter.didPositionChange()) {
+          return;
         }
 
         this.send('CREATE_PROP', {
-          type: trailer.stepsRemaining % 2 == 0 ? 'BLOODY_BOOTPRINT_LEFT' : 'BLOODY_BOOTPRINT_RIGHT', 
-          xPosition: trail.getXPosition() + (trailer.stepsRemaining % 2 == 0 ? 2 : -2) , 
-          yPosition: trail.getYPosition() + (trailer.stepsRemaining % 2 == 0 ? 2 : -2) , 
+          type: trailEmitter.getTrailRemaining() % 2 == 0 ? 'BLOODY_BOOTPRINT_LEFT' : 'BLOODY_BOOTPRINT_RIGHT', 
+          xPosition: trailEmitter.getXPosition() + (trailEmitter.trailRemaining % 2 == 0 ? 2 : -2) , 
+          yPosition: trailEmitter.getYPosition() + (trailEmitter.trailRemaining % 2 == 0 ? 2 : -2) , 
           width: 4, 
           height: 16, 
-          angleDegrees: trail.getAngleDegrees() + 90
+          angleDegrees: trailEmitter.getAngleDegrees() + 90
         });
 
-        trailer.stepsRemaining -= 1;
-        if (this.trailers[trail.getId()].stepsRemaining <= 0) {
-          clearInterval(this.trailers[trail.getId()].interval);
-        }
-      }, 500)
+        trailEmitter.updateTrailStats();
+      });
+    }
 
+    addFootstepTrailFx(entity) {
+        entity.addComponent(new TrailZoneComponent());
+    }
 
-      this.trailers[trail.getId()] = {
-        interval: interval,
-        stepsRemaining: 10,
-        lastXPosition: trail.getXPosition(),
-        lastYPosition: trail.getYPosition()
-      }
+    _setShouldCreateTrail(trailEmitter) {
+      trailEmitter.setTrailRemaining(10)
     }
 
 
-    _calculateDistanceBetween(trail, trailGenerator) {
-      let dx = trail.getXPosition() - trailGenerator.getXPosition();
-      let dy = trail.getYPosition() - trailGenerator.getYPosition();
+    _calculateDistanceBetween(trailEmitter, trailZone) {
+      let dx = trailEmitter.getXPosition() - trailZone.getXPosition();
+      let dy = trailEmitter.getYPosition() - trailZone.getYPosition();
 
       return Math.sqrt(dx * dx + dy * dy);
     }

@@ -19,5 +19,9 @@ export default class PositionComponent extends Component {
         this.proposedXPositionValid = true;
         this.proposedYPositionValid = true;
         this.proposedAngleDegreesValid = true;
+
+        // Useful trackers for post-movement processing
+        this.lastXPosition = payload.xPosition;
+        this.lastYPosition = payload.yPosition;
     }
 }

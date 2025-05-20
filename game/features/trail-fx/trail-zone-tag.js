@@ -1,15 +1,15 @@
 import { default as Tag } from '@core/tag';
 
-export default class TrailGenerator extends Tag {
-    static tagType = 'TrailGenerator';
+export default class TrailZone extends Tag {
+    static tagType = 'TrailZone';
 
     constructor() {
         super();
-        this.tagType = 'TrailGenerator';
+        this.tagType = 'TrailZone';
     }
 
     static isAssignableTo(entity) {
-        return entity.hasComponent('TrailGeneratorComponent') && entity.getComponent('PositionComponent');
+        return entity.hasComponent('TrailZoneComponent') && entity.getComponent('PositionComponent');
     }
 
     getXPosition() {

@@ -21,6 +21,7 @@ import MaterialComponent from '../engine/material/material-component';
 import AiComponent from '@game/engine/ai/ai-component';
 import AudioListenerComponent from '../engine/audio/audio-listener-component';
 import HealthComponent from '@game/genre/combat/health-component';
+import TrailEmitterComponent from '../features/trail-fx/trail-emitter-component';
 
 export function createTestData() {
     let player = addPlayer(310, -450)
@@ -30,8 +31,6 @@ export function createTestData() {
 function addPlayer(x, y) {
     let entity = new Entity({key: 'pc'})
     
-    entity.addLabel('FootstepTrailFxCapable');
-
     let size = 16;
     let position = new PositionComponent(
         {
@@ -72,6 +71,7 @@ function addPlayer(x, y) {
     }))
     entity.addComponent(new FootstepFxComponent({
     }))
+    entity.addComponent(new TrailEmitterComponent());
     entity.addComponent(new HealthComponent({
         health: 150,
         postDamageInvincibilityMs: 1000,
