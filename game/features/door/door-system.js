@@ -27,6 +27,10 @@ export default class DoorSystem extends System {
         });
         if (openedDoor) {
             this.send('FORCE_RECALCULATE_LIGHT')
+            this.send("PLAY_AUDIO", {
+                audioKey: 'metal-door-open.mp3',
+                volume: 0.8
+            })
         }
     }
 
