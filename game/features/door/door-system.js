@@ -15,14 +15,19 @@ export default class DoorSystem extends System {
     }
     
     work() {
+        let openedDoor = false;
         this.workForTag('DoorOpener', (doorOpener) => {
             this.workForTag('Door', (door) => {
                 let distance = calculateDistanceBetweenTags(door, doorOpener);
                 if (distance < 30) {
                     this._openDoor(door);
+                    openedDoor = true;
                 }
             });
         });
+        if (openedDoor) {
+            this.send('FORCE_RECALCULATE_LIGHT')
+        }
     }
 
     _openDoor(door) {

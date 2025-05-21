@@ -5,11 +5,10 @@ export default class LightSystem extends System {
         super();
         this.shadowColor = 'rgba(0, 0, 0, 1)';
         this.trigonometryCache = {}
+        this.forceRecalculateLight = false;
     }
 
     initialize() {
-
-        
         if (window.location.href.indexOf('nolight') == -1) {
             this.send("REGISTER_RENDER_LAYER", {
                 layer: 'LIGHTING',
@@ -21,8 +20,10 @@ export default class LightSystem extends System {
             })
         }
         
-
         this._initializeTrigCache();
+        this.addHandler('FORCE_RECALCULATE_LIGHT', (payload) => {
+            this.forceRecalculateLight = true;
+        });
     }
 
     _initializeTrigCache() {
@@ -45,15 +46,17 @@ export default class LightSystem extends System {
 
     _updateLighting(layerCtx, viewport, renderer) {
         this.workForTag('Lightable', (lightable, entity) => {
-            if (!lightable.isOn()) {
+            if (!lightable.isOn() && !this.forceRecalculateLight) {
                 return;
             }
-            if (lightable.shouldFlickerOff()) {
+            if (lightable.shouldFlickerOff() && !this.forceRecalculateLight) {
                 return;
             }
             this._calculateLightRays(lightable)
             this._renderLightMask(layerCtx, viewport, renderer, lightable); 
         })
+
+        this.forceRecalculateLight = false;
     }
 
 
@@ -62,7 +65,7 @@ export default class LightSystem extends System {
     ////
     
     _calculateLightRays(lightable) {
-        if (lightable.getRays().length > 0 && lightable.getLightRefresh() == 'static') {
+        if (lightable.getRays().length > 0 && lightable.getLightRefresh() == 'static' && !this.forceRecalculateLight) {
             return;
         }
 
