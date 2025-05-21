@@ -41,8 +41,14 @@ const map = {
         // INTRO AREA
         {type: 'TRUCK_CABIN_TOP', xPosition: 490, yPosition: -490, width: 100, height: 80, collision: 'wall', hitscan: true},
         {type: 'TRUCK_CABIN_TOP', xPosition: 130, yPosition: -490, width: 100, height: 80, collision: 'wall', hitscan: true},
-        {type: 'METAL_DOOR', xPosition: 310, yPosition: -300, width: 60, height: 4, collision: 'wall', hitscan: true, shadow: true},
         {type: 'BLOOD_POOL_1', xPosition: 310, yPosition: -270, width: 50, height: 50, angleDegrees: 'random'},
+        {type: 'BLOODY_BOOTPRINT_RIGHT', xPosition: 300, yPosition: -390, width: 4, height: 16, angleDegrees: 180},
+        {type: 'BLOODY_BOOTPRINT_LEFT', xPosition: 310, yPosition: -370, width: 4, height: 16, angleDegrees: 180},
+        {type: 'BLOODY_BOOTPRINT_RIGHT', xPosition: 300, yPosition: -350, width: 4, height: 16, angleDegrees: 180},
+        {type: 'BLOODY_BOOTPRINT_LEFT', xPosition: 310, yPosition: -330, width: 4, height: 16, angleDegrees: 180},
+        {type: 'BLOODY_BOOTPRINT_RIGHT', xPosition: 300, yPosition: -310, width: 4, height: 16, angleDegrees: 180},
+        {type: 'BLOODY_BOOTPRINT_LEFT', xPosition: 310, yPosition: -290, width: 4, height: 16, angleDegrees: 180},
+        {type: 'METAL_DOOR', xPosition: 310, yPosition: -300, width: 60, height: 4, collision: 'wall', hitscan: true, shadow: true},
 
         // Intro - Right Truck Zone
         {type: 'CONE_TOP', xPosition: 430, yPosition: -450, width: 20, height: 20, angleDegrees: 'random', collision: 'wall'}, // box
