@@ -1,7 +1,6 @@
 import '@core/component';
 import '@core/tag';
 
-import  { startGame } from '@game/title/start-game'
 
 function defineCanvas() {
     var canvas = document.createElement("canvas");
@@ -24,7 +23,6 @@ function defineCanvas() {
 
 import '@game/title/font-loader.js';
 
-setTimeout(() => {
-    defineCanvas();
-    startGame();
-}, 100);
+defineCanvas();
+
+import '@game/title/title-screen'

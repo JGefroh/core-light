@@ -7,6 +7,9 @@ export default class AssetConfigurationSystem extends System {
       super()
 
       this.send('LOAD_ASSETS', {assetManifest: assetManifest})
+      if (config.skipMapLoad) {
+        return;
+      }
       this.send('LOAD_MAP', mapWarehouse)
     }
 }
