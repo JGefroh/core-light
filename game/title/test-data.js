@@ -76,6 +76,13 @@ function addPlayer(x, y) {
         health: 150,
         postDamageInvincibilityMs: 1000,
         onHealthLoss: (entity, health) => {
+            if (health >= 100) {
+                render.shapeColor = 'rgba(190, 183, 50, 1)	'
+                
+            }
+            else if (health >= 0) {
+                render.shapeColor = 'rgba(160, 20, 20, 1)'
+            }
             render.borderSize -= health / 100
             let hurtSounds = [
                 'hurt-1.mp3',
