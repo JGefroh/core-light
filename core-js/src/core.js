@@ -234,10 +234,11 @@ class Core {
   clear() {
     this.timer = 0;
     this.timeLastChecked = null;
-    this.workInterval = null;
+    this.workInterval = this.workInterval ? clearInterval(this.workInterval) : null;
     this.isPaused = false;
     this.desiredFPS = 60;
     this.tick = 0;
+    this.now = Date.now();
 
     this.systems = [];
     this.entities = [];

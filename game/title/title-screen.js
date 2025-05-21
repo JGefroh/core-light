@@ -176,8 +176,9 @@ function resetSystems() {
 
 function addHandler() {
     window.onclick = function(event) {
+        window.onclick = null;
         Core.addSystem(new AudioSystem())
-        playSounds();
+        playSounds(true);
     }
 
     window.onkeydown = function(event) {
@@ -185,8 +186,7 @@ function addHandler() {
         event.stopPropagation();
         event.preventDefault();
         resetSystems();
-        window.location.href = '/?skiptitle=true'
-        // startGame();
+        startGame();
     };
 }
 
@@ -378,9 +378,12 @@ function playSounds() {
         'zombie-moan-7.mp3',
     ]
 
+    Core.send("PLAY_AUDIO", {
+        audioKey: _randomFrom(zombieMoans),
+        volume: 0.5 
+    });
     let interval = setInterval(() => {
         if (stopTitle) {
-            console.info("CLEARIN")
             clearInterval(interval);
             return;
         }
@@ -430,6 +433,14 @@ function addTitle() {
       text: 'by Joseph Gefroh',
       fontSize: 22,
     });
+
+    Core.send('ADD_GUI_RENDERABLE', {
+        key: `title-card-3`,
+        xPosition: 46,
+        yPosition: window.innerHeight - 40,
+        text: 'github.com/jgefroh/core-light',
+        fontSize: 14,
+      });
   
   
     Core.send('ADD_GUI_RENDERABLE', {
