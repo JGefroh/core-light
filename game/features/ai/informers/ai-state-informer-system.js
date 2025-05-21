@@ -34,6 +34,7 @@ export default class AiStateInformerSystem extends System {
         results.push({
           xPosition: positionComponent?.xPosition,
           yPosition: positionComponent?.yPosition,
+          angleDegrees: positionComponent?.angleDegrees,
           entityId: controllable?.id
         })
       });
