@@ -7,6 +7,7 @@ export default class AudioSystem extends System {
       this.exclusiveGroups = {}
       this.audioState = {
       }
+      this.audioCache = {}
 
       this.addHandler('PLAY_AUDIO', (payload) => {
         const {
@@ -32,7 +33,7 @@ export default class AudioSystem extends System {
         }
       
         try {
-          const audio = new Audio(`assets/audio/${audioKey}`);
+          const audio = this._getAudioFromPool(audioKey);
           audio.currentTime = startAt;
           audio.loop = loop;
           audio.volume = payload.decibels > 0 ? this.getVolume(sourceXPosition, sourceYPosition, decibels) : volume;
@@ -77,6 +78,17 @@ export default class AudioSystem extends System {
   
     work() {
     };
+
+    _getAudioFromPool(audioKey) {
+      this.audioCache[audioKey] ||= [];
+      const pool = this.audioCache[audioKey];
+      let audio = pool.find(a => a.paused || a.ended);
+      if (!audio) {
+        audio = new Audio(`assets/audio/${audioKey}`);
+        pool.push(audio);
+      }
+      return audio;
+    }
 
     _getAudioListenerPosition() {
       let position = null;
