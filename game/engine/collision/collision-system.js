@@ -52,7 +52,7 @@ export default class CollisionSystem extends System {
         if (skipX && skipY) return;
 
         target.setEntity(entity2);
-        if (!entity2?.id || !this._checkShouldCheck(shot, target)) return;
+        if (!entity1?.id || !entity2?.id || !this._checkShouldCheck(shot, target)) return;
 
         if (!skipX) {
           const collidedX = this._checkCollided(
