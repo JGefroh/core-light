@@ -165,6 +165,7 @@ function addEntities() {
     addFootsteps();
     addShellCasings();
     addDebris();
+    addShelf();
 }
 
 function resetSystems() {
@@ -391,6 +392,15 @@ function playSounds() {
         }
     }, 1000);
     
+}
+
+function addShelf() {
+    let x = window.innerWidth;
+    let y = window.innerHeight;
+    Core.send('CREATE_PROP', {type: 'METAL_SHELF_FRONT', xPosition: x - 100, yPosition: y / 4, width: 320, height: 320, collision: 'wall', angleDegrees: 40});
+    Core.send('CREATE_PROP', {type: 'CARDBOARD_BOX_RANDOM', xPosition: x * Math.random(), yPosition: y * Math.random(), width: 60, height: 60, collision: 'wall', angleDegrees: 'random'});
+    Core.send('CREATE_PROP', {type: 'CARDBOARD_BOX_RANDOM', xPosition: x * Math.random(), yPosition: y * Math.random(), width: 60, height: 60, collision: 'wall', angleDegrees: 'random'});
+    Core.send('CREATE_PROP', {type: 'CARDBOARD_BOX_RANDOM', xPosition: x * Math.random(), yPosition: y * Math.random(), width: 60, height: 60, collision: 'wall', angleDegrees: 'random'});
 }
 
 function _randomFrom(array) {
