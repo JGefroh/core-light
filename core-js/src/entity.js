@@ -75,6 +75,7 @@ export default class Entity {
 
   addLabel(label) {
     this.labels[label] = true;
+    this.markChanged(true)
   }
 
   removeLabel(label) {

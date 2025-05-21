@@ -41,6 +41,7 @@ const map = {
         // INTRO AREA
         {type: 'TRUCK_CABIN_TOP', xPosition: 490, yPosition: -490, width: 100, height: 80, collision: 'wall', hitscan: true},
         {type: 'TRUCK_CABIN_TOP', xPosition: 130, yPosition: -490, width: 100, height: 80, collision: 'wall', hitscan: true},
+        {type: 'METAL_DOOR', xPosition: 310, yPosition: -300, width: 60, height: 4, collision: 'wall', hitscan: true, shadow: true},
         {type: 'BLOOD_POOL_1', xPosition: 310, yPosition: -270, width: 50, height: 50, angleDegrees: 'random'},
 
         // Intro - Right Truck Zone
@@ -108,7 +109,6 @@ const map = {
 
         // INTRO AREA
         {xPosition: 300, yPosition: -600, type: 'point', radius: 400},
-
     ],
     enemies: [
         {xPosition: 40, yPosition: -50, type: 'normal'},

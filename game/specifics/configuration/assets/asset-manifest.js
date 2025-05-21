@@ -12,6 +12,7 @@ const manifest = {
         'MEAT_CHUNK_2': { path: 'meat-chunk-2.png'},
         'MEAT_CHUNK_3': { path: 'meat-chunk-3.png'},
         'MEAT_CHUNK_4': { path: 'meat-chunk-4.png'},
+        'METAL_DOOR': { path: 'metal-door.jpg'},
         'BLOODY_BOOTPRINT_LEFT': { path: 'bloody-bootprint-left.png'},
         'BLOODY_BOOTPRINT_RIGHT': { path: 'bloody-bootprint-right.png'},
         'CARDBOARD_BOX_FLAT_1': { path: 'cardboard-box-flat-1.png' },

@@ -99,6 +99,7 @@ function addPlayer(x, y) {
             })
         }
     }))
+    entity.addLabel('DoorOpener');
     entity.addComponent(new AudioListenerComponent({}))
 
 

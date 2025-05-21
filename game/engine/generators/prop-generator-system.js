@@ -61,19 +61,19 @@ export default class PropGeneratorSystem extends System {
         let propAngle = propRequest.angleDegrees === 'random' ? Math.random() * 360 : propRequest.angleDegrees || 0;
     
         const propDetails = this.propMap[propRequestType];
-    
-        if (propRequest.shadow || propRequest.collision) {
-            this._createShadowProp(
-                propRequest.xPosition,
-                propRequest.yPosition,
-                propRequest.width,
-                propRequest.height,
-                propAngle,
-                propRequest
-            );
-        }
 
         if (propDetails.parts) {
+    
+            if (propRequest.shadow || propRequest.collision) {
+                this._createShadowProp(
+                    propRequest.xPosition,
+                    propRequest.yPosition,
+                    propRequest.width,
+                    propRequest.height,
+                    propAngle,
+                    propRequest
+                );
+            }
             propDetails.parts.forEach((part) => {
                 const scaleX = propRequest.width / propDetails.width;
                 const scaleY = propRequest.height / propDetails.height;
@@ -121,12 +121,13 @@ export default class PropGeneratorSystem extends System {
                 propRequest.yPosition,
                 propRequest.width,
                 propRequest.height,
-                propAngle|| 0
+                propAngle|| 0,
+                propRequest
             );   
         }
     }
 
-    _createPropImage(imageKey, xPosition, yPosition, width, height, angleDegrees) {
+    _createPropImage(imageKey, xPosition, yPosition, width, height, angleDegrees, options) {
         let entity = new Entity({type: imageKey})
 
         entity.addComponent(new PositionComponent(
@@ -146,6 +147,17 @@ export default class PropGeneratorSystem extends System {
             renderLayer: 'PROP',
             imagePath: imageKey
         }))
+        if (options.shadow) {
+            entity.addComponent(new ShadowComponent())
+        }
+        if (options.collision) {
+            entity.addComponent(new CollisionComponent({
+                collisionGroup: options.collision || 'wall'
+            }))
+        }
+        if (options.hitscan) {
+            entity.addComponent(new HitscanTargetComponent())
+        }
         this._core.addEntity(entity);
     }
 

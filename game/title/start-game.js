@@ -97,6 +97,9 @@ import HasLogic from '../engine/logic/has-logic';
 import TrailSystem from '../features/trail-fx/trail-system';
 import TrailZone from '../features/trail-fx/trail-zone-tag';
 import TrailEmitter from '../features/trail-fx/trail-emitter-tag';
+import DoorSystem from '../features/door/door-system';
+import Door from '../features/door/door-tag';
+import DoorOpener from '../features/door/door-opener';
 
 export function startGame() {
 
@@ -212,6 +215,12 @@ export function startGame() {
     Core.addSystem(new TrailSystem());
         Core.addTag(TrailZone);
         Core.addTag(TrailEmitter);
+
+
+    // Prop Logic
+    Core.addSystem(new DoorSystem());
+        Core.addTag(Door);
+        Core.addTag(DoorOpener);
 
     // Game logic and conditions
     Core.addSystem(new InstructionSystem());
