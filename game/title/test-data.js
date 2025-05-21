@@ -165,6 +165,13 @@ function _createPlayerLaser(x, y, playerEntity) {
             yPosition: y
         }
     ));
+    entity.addComponent(new LightSourceComponent({
+        lightType: 'self',
+        lightRefresh: 'dynamic',
+        angleDegrees: 0,
+        maxDistance: 30,
+        disableOverride: true,
+    }))
     entity.addComponent(new RenderComponent({
         width: 3,
         height: 3,
