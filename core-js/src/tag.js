@@ -23,6 +23,10 @@ export default class Tag {
     return this.entity;
   }
 
+  isInactive(){ 
+    return !this.entity?.id;
+  }
+
   static getTagType() {
     return this.tagType;
   }

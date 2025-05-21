@@ -55,6 +55,9 @@ export default class RifleReloadSystem extends System {
           });
 
           setTimeout(() => {
+            if (tag.isInactive()) {
+              return;
+            }
             tag.setCurrentAmmunition(30)
 
             this.forKeyedAs('player-flashlight', (light) => {
