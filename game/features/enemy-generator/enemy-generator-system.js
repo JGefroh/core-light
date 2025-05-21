@@ -10,6 +10,7 @@ import AiComponent from '@game/engine/ai/ai-component';
 import MaterialComponent from '@game/engine/material/material-component';
 import HealthComponent from '../../genre/combat/health-component';
 import TrailEmitterComponent from '../trail-fx/trail-emitter-component';
+import TimerComponent from '../../engine/timer/timer-component';
 
 
 export default class EnemyGeneratorSystem extends System {
@@ -127,7 +128,39 @@ export default class EnemyGeneratorSystem extends System {
                 render.borderSize = health / 100;
             }
         }));
+        this._addZombieMoan(entity)
         this._core.addEntity(entity);
+    }
+
+    _addZombieMoan(entity) {
+        let zombieMoans = [
+            'zombie-moan-1.mp3',
+            'zombie-moan-2.mp3',
+            'zombie-moan-3.mp3',
+            'zombie-moan-4.mp3',
+            'zombie-moan-5.mp3',
+            'zombie-moan-6.mp3',
+            'zombie-moan-7.mp3',
+        ]
+        let timer = new TimerComponent({
+            time: 3000,
+            onEndEffect: () => {
+                let position = entity.getComponent('PositionComponent')
+
+                if (Math.random() <= 0.02) {
+                    this.send("PLAY_AUDIO", {
+                        audioKey: this._randomFrom(zombieMoans),
+                        sourceXPosition: position.xPosition,
+                        sourceYPosition: position.yPosition,
+                        decibels: 120
+                    })
+                }
+
+                timer.endedAt = null;
+                timer.startedAt = Date.now();
+            }
+        });
+        entity.addComponent(timer);
     }
     
     _randomFrom(array) {

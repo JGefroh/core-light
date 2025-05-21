@@ -13,11 +13,15 @@ export default class Timer extends Tag{
     };
 
     isTime() {
-      return (Date.now() - this.entity.getComponent('TimerComponent').startedAt >= this.entity.getComponent('TimerComponent').time)
+      return !this.entity.getComponent('TimerComponent').endedAt && (Date.now() - this.entity.getComponent('TimerComponent').startedAt >= this.entity.getComponent('TimerComponent').time)
     }
 
     getOnEndEffect() {
       return this.entity.getComponent('TimerComponent').onEndEffect
+    }
+
+    setEndedAt(endedAt) {
+      this.entity.getComponent('TimerComponent').endedAt = endedAt;
     }
 
     removeTimer() {

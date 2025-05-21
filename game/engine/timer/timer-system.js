@@ -12,12 +12,10 @@ export default class TimerSystem extends System {
             this._core.removeEntity(entity);
           }
           else if (typeof tag.getOnEndEffect() == 'function') {
-            if (tag.getOnEndEffect()()) {
-              tag.removeTimer();
-              this._core.removeEntity(entity);
-            }
-            else {
-              tag.removeTimer();
+            tag.setEndedAt(Date.now())
+
+            if (tag.getOnEndEffect()) {
+              tag.getOnEndEffect()();
             }
           }
         }

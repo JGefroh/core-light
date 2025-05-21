@@ -7,5 +7,6 @@ export default class TimerComponent extends Component {
         this.onEndEffect = payload.onEndEffect || 'destroy_entity'
         this.startedAt = Date.now();
         this.time = payload.time;
+        this.endedAt = null;
     }
 }
