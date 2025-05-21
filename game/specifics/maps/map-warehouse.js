@@ -41,7 +41,7 @@ const map = {
         // INTRO AREA
         {type: 'TRUCK_CABIN_TOP', xPosition: 490, yPosition: -490, width: 100, height: 80, collision: 'wall', hitscan: true},
         {type: 'TRUCK_CABIN_TOP', xPosition: 130, yPosition: -490, width: 100, height: 80, collision: 'wall', hitscan: true},
-        {type: 'BLOOD_POOL_1', xPosition: 300, yPosition: -250, width: 50, height: 50, angleDegrees: 'random'},
+        {type: 'BLOOD_POOL_1', xPosition: 310, yPosition: -270, width: 50, height: 50, angleDegrees: 'random'},
 
         // Intro - Right Truck Zone
         {type: 'CONE_TOP', xPosition: 430, yPosition: -450, width: 20, height: 20, angleDegrees: 'random', collision: 'wall'}, // box
@@ -54,6 +54,7 @@ const map = {
         {type: 'CONE_TOP', xPosition: 187, yPosition: -410, width: 20, height: 20, angleDegrees: 'random', collision: 'wall'}, // box
         {type: 'CONE_TOP', xPosition: 190, yPosition: -365, width: 20, height: 20, angleDegrees: 'random', collision: 'wall'}, // box
         {type: 'CONE_TOP', xPosition: 205, yPosition: -323, width: 20, height: 20, angleDegrees: 'random', collision: 'wall'}, // box
+        {type: 'BLOOD_POOL_1', xPosition: 210, yPosition: -200, width: 50, height: 50, angleDegrees: 'random'},
 
         {type: 'CARDBOARD_BOX', xPosition: 130, yPosition: -80, width: 20, height: 20, angleDegrees: 45, angleDegrees: 'random' }, // box
         {type: 'CARDBOARD_BOX', xPosition: 130, yPosition: -120, width: 20, height: 20, angleDegrees: 98 }, // box
@@ -110,15 +111,15 @@ const map = {
 
     ],
     enemies: [
-        {xPosition: 100, yPosition: -50, type: 'normal'},
+        {xPosition: 40, yPosition: -50, type: 'normal'},
         {xPosition: 115, yPosition: -330, type: 'normal_fast'}, // Left Truck
         {xPosition: 130, yPosition: -330, type: 'normal_fast'}, // Left Truck
         {xPosition: 145, yPosition: -330, type: 'normal_fast'}, // Left Truck
         {xPosition: 115, yPosition: -310, type: 'normal_fast'}, // Left Truck
         {xPosition: 130, yPosition: -310, type: 'normal_fast'}, // Left Truck
         {xPosition: 145, yPosition: -310, type: 'normal_fast'}, // Left Truck
-        {xPosition: 100, yPosition: 0, type: 'normal_fast'},
-        {xPosition: 210, yPosition: -40, type: 'normal_fast'},
+        {xPosition: 550, yPosition: 0, type: 'normal_fast'},
+        {xPosition: 210, yPosition: -20, type: 'normal_fast'},
         {xPosition: 180, yPosition: -250},
         {xPosition: 500, yPosition: 20},
         {xPosition: 500, yPosition: -200},
