@@ -18,7 +18,7 @@ export default class ParticleSystem extends System {
         });
 
         this.send("REGISTER_RENDER_LAYER", {
-            layer: 'PARTICLES',
+            layer: 'PARTICLES_BEFORE_LIGHTING',
             render: (renderOptions) => {
                 this._render(this.particles, renderOptions)
             }

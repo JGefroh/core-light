@@ -18,7 +18,7 @@ export default class RenderSystem extends System {
       this.primaryCanvas = document.getElementById('canvas');
 
       // Rules around the canvas stack
-      this.canvasLayerOrder = ['RENDERABLES', 'LIGHTING', 'PARTICLES']
+      this.canvasLayerOrder = ['RENDERABLES', 'PARTICLES_BEFORE_LIGHTING', 'LIGHTING', 'PARTICLES_AFTER_LIGHTING']
       this.canvasesByLayer = {}
       this.canvasesByKey = {}
       this.lastCanvasLayerId = 0;

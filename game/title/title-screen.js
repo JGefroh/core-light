@@ -166,6 +166,7 @@ function addEntities() {
     addShellCasings();
     addDebris();
     addShelf();
+    addDust();
 }
 
 function resetSystems() {
@@ -404,6 +405,31 @@ function addShelf() {
     Core.send('CREATE_PROP', {type: 'CARDBOARD_BOX_RANDOM', xPosition: x * Math.random(), yPosition: y * Math.random(), width: 60, height: 60, collision: 'wall', angleDegrees: 'random'});
     Core.send('CREATE_PROP', {type: 'CARDBOARD_BOX_RANDOM', xPosition: x * Math.random(), yPosition: y * Math.random(), width: 60, height: 60, collision: 'wall', angleDegrees: 'random'});
     Core.send('CREATE_PROP', {type: 'CARDBOARD_BOX_RANDOM', xPosition: x * Math.random(), yPosition: y * Math.random(), width: 60, height: 60, collision: 'wall', angleDegrees: 'random'});
+}
+
+function addDust() {
+    for (let i = 0; i < 1000; i++) {
+        Core.send('EMIT_PARTICLES', {
+            xPosition: window.innerWidth * Math.random(),
+            yPosition: window.innerHeight * Math.random(),
+            particleEmitFrequencyInMs: 0,
+            particleEmissionCyclesMax: 1,
+            particleShape: 'circle',
+            particleCount: 1,
+            particleLifetimeMin: 150000,
+            particleLifetimeMax: 150000,
+            particleHeightMin: 1.2, //0.08 is pretty much the smallest
+            particleHeightMax: 0.2,
+            particleWidthMin: 1.2,
+            particleWidthMax: 0.2,
+            particleColors: [`rgba(255, 255, 255, ${Math.random()}`],
+            particleSpeedMin: 0.5,
+            particleSpeedMax: 5,
+            particleEmissionAngleDegreesMin: 0,
+            particleEmissionAngleDegreesMax: 360
+        });
+    }
+    
 }
 
 function _randomFrom(array) {
