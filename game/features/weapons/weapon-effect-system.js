@@ -19,6 +19,7 @@ export default class WeaponEffectSystem extends System {
         this.addPointLightFlash(payload.weaponXPosition, payload.weaponYPosition);
         this.addShellCasing(payload.weaponXPosition, payload.weaponYPosition, tag.getAngleDegrees())
         this.addMuzzleFlash(payload.weaponXPosition, payload.weaponYPosition, tag.getAngleDegrees())
+        this.addDust(payload.weaponXPosition, payload.weaponYPosition, tag.getAngleDegrees());
 
         this.send('HITSCAN_REQUESTED', {
           originX: payload.weaponXPosition,
@@ -133,23 +134,6 @@ export default class WeaponEffectSystem extends System {
       particleShape: 'circle'
     };
   
-    // Flash core (tight bright center)
-    this._core.send('EMIT_PARTICLES', {
-      ...basePayload,
-      particleCount: 2,
-      particleLifetimeMin: 20,
-      particleLifetimeMax: 40,
-      particleHeightMin: 6,
-      particleHeightMax: 8,
-      particleWidthMin: 6,
-      particleWidthMax: 8,
-      particleColors: ['#ffffff', '#ffffcc'],
-      particleSpeedMin: 0,
-      particleSpeedMax: 10,
-      particleEmissionAngleDegreesMin: angleDegrees,
-      particleEmissionAngleDegreesMax: angleDegrees
-    });
-  
     // Outer flash glow ring (slightly delayed, larger)
     this._core.send('EMIT_PARTICLES', {
       ...basePayload,
@@ -263,5 +247,27 @@ export default class WeaponEffectSystem extends System {
 
   _getRandomFrom(collection) {
     return collection[Math.floor(Math.random() * collection.length)]
-}
+  }
+
+  addDust(x, y, angleDegrees) {
+    this._core.send('EMIT_PARTICLES', {
+      xPosition: x,
+      yPosition: y,
+      particleEmitFrequencyInMs: 0,
+      particleEmissionCyclesMax: 1,
+      particleShape: 'circle',
+      particleCount: 10,
+      particleLifetimeMin: 30000,
+      particleLifetimeMax: 60000,
+      particleHeightMin: 0.08, //0.08 is pretty much the smallest
+      particleHeightMax: 0.2,
+      particleWidthMin: 0.08,
+      particleWidthMax: 0.2,
+      particleColors: [`rgba(255, 255, 255, ${Math.random()}`],
+      particleSpeedMin: 0,
+      particleSpeedMax: 20,
+      particleEmissionAngleDegreesMin: angleDegrees - 20,
+      particleEmissionAngleDegreesMax: angleDegrees + 20,
+    });
+  }
 }
