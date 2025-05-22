@@ -132,7 +132,7 @@ function _createPlayerFlashlight(x, y, playerEntity) {
     ));
     entity.addComponent(new LightSourceComponent({
         lightType: 'cone',
-        maxDistance: 300,
+        maxDistance: 200,
         coneDegrees: 45,
         lightRefresh: 'dynamic'
     }))
@@ -188,7 +188,7 @@ function _createPlayerLaser(x, y, playerEntity) {
         renderFromCorner: true
     }))
 
-    entity.addComponent(new AttachedComponent({ attachedToEntity: playerEntity, sync: ['xPosition', 'yPosition', 'angleDegrees'], attachmentOptions: {xPosition: 250, yPosition: 4, angleDegrees: 0}}));
+    entity.addComponent(new AttachedComponent({ attachedToEntity: playerEntity, sync: ['xPosition', 'yPosition', 'angleDegrees'], attachmentOptions: {xPosition: 166, yPosition: 4, angleDegrees: 0}}));
   
     Core.addEntity(entity);
 }

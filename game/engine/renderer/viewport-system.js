@@ -5,7 +5,7 @@ export default class ViewportSystem extends System {
     super()
     this.viewportWidth = window.innerWidth;
     this.viewportHeight = window.innerHeight;
-    this.viewportScale = 2;
+    this.viewportScale = 2.4;
 
     if (window.location.href.indexOf('debug1') != -1) {
       this.viewportScale = 0.9

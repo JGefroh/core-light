@@ -24,7 +24,7 @@ export default class LaserAimSystem extends System {
                 originX: positionComponent.xPosition,
                 originY: positionComponent.yPosition,
                 angleDegrees: positionComponent.angleDegrees,
-                range: 250,
+                range: 166,
                 callback: (result) => {
                     this._updateLaserPosition(result);
                 }
