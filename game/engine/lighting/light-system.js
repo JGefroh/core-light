@@ -88,7 +88,7 @@ export default class LightSystem extends System {
             rays.push({
                 x: results.x, 
                 y: results.y, 
-                angle: angle
+                angle: angle,
             });
         }
     
@@ -199,12 +199,52 @@ export default class LightSystem extends System {
     /////
 
     _renderLightMask(renderCtx, viewport, renderer, lightable) {
+        if (lightable.getLightType() == 'cone') {
+            this._renderLightMaskForCone(renderCtx, viewport, renderer, lightable);
+        }
+        else {
+            this._renderLightMaskForNonCone(renderCtx, viewport, renderer, lightable);
+        }
+    }
+
+    _renderLightMaskForCone(renderCtx, viewport, renderer, lightable) {
+        if (!lightable.getRays().length) {
+            return;
+        }
+
+        let rays = lightable.getRays();
+
+        const startAngleRadians = rays[0].angle;
+        const endAngleRadians = rays[rays.length - 1].angle;
+        const softnessRadians = 10 * Math.PI / 180; // 10 degrees in radians
+        
         renderer.drawLightPath(renderCtx, viewport, 
             lightable.getXPosition(), 
             lightable.getYPosition(), 
             lightable.getRays(), 
             {
-                returnToOrigin: lightable.getLightType() == 'cone' ? false : true,
+                returnToOrigin: false,
+                arcSize: lightable.getMaxDistance(),
+                startAngleRadians: startAngleRadians,
+                endAngleRadians: endAngleRadians,
+                softnessRadians: softnessRadians,
+                fill: [
+                    [0.0, 'rgba(255, 250, 230, 1.0)'],
+                    [0.1, 'rgba(255, 245, 200, 1.0)'],
+                    [0.8, 'rgba(255, 220, 150, 0.5)'],
+                    [1.0,  'rgba(255, 220, 150, 0)'],
+                ]
+            }
+        );
+    }
+
+    _renderLightMaskForNonCone(renderCtx, viewport, renderer, lightable) {
+        renderer.drawLightPath(renderCtx, viewport, 
+            lightable.getXPosition(), 
+            lightable.getYPosition(), 
+            lightable.getRays(), 
+            {
+                returnToOrigin: true,
                 arcSize: lightable.getMaxDistance(),
                 fill: [
                     [0.0, 'rgba(255, 250, 230, 1.0)'],

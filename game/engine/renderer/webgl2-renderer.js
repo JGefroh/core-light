@@ -156,7 +156,13 @@ export default class WebGl2Renderer {
   drawLightPath(renderCtx, viewport, xPosition, yPosition, pathPoints, {
     returnToOrigin = true,
     arcSize = 1000,
-    fill = []// array of [offset, rgba]
+    fill = [], // array of [offset, rgba],
+
+    // Optional for edge feathering
+    startAngleRadians = null,
+    endAngleRadians = null,
+    softnessRadians = null
+    
   }) {
     if (!pathPoints?.length) return;
 
@@ -173,15 +179,22 @@ export default class WebGl2Renderer {
     const projectionMatrix = this._buildProjectionMatrix(renderCtx, viewport);
     renderCtx.uniformMatrix4fv(program.uniforms.u_projectionMatrix, false, projectionMatrix);
 
-    const { stopCount, stops, colors } = this._parseGradientStops(fill);
 
+    // Gradient (for in to out fuzziness)
+    const { stopCount, stops, colors } = this._parseGradientStops(fill);
     renderCtx.uniform1i(program.uniforms.u_stopCount, stopCount);
     renderCtx.uniform1fv(program.uniforms.u_stops, stops);
     renderCtx.uniform4fv(program.uniforms.u_colors, colors);
-
+    
     // Upload center and radius
     renderCtx.uniform2f(program.uniforms.u_center, xPosition, yPosition);
     renderCtx.uniform1f(program.uniforms.u_radius, arcSize);
+
+    // Edge feathering
+    renderCtx.uniform1i(program.uniforms.u_isCone, startAngleRadians != null);
+    renderCtx.uniform1f(program.uniforms.u_startAngleRadians, startAngleRadians || 0.0);
+    renderCtx.uniform1f(program.uniforms.u_endAngleRadians, endAngleRadians || 0.0);
+    renderCtx.uniform1f(program.uniforms.u_softnessRadians, softnessRadians || 0.0);
 
     // Draw triangles
     const vertexCount = vertices.length / 2;
@@ -431,7 +444,11 @@ export default class WebGl2Renderer {
         u_radius: renderCtx.getUniformLocation(program, 'u_radius'),
         u_stopCount: renderCtx.getUniformLocation(program, 'u_stopCount'),
         u_stops: renderCtx.getUniformLocation(program, 'u_stops'),
-        u_colors: renderCtx.getUniformLocation(program, 'u_colors')
+        u_colors: renderCtx.getUniformLocation(program, 'u_colors'),
+        u_isCone: renderCtx.getUniformLocation(program, 'u_isCone'), 
+        u_startAngleRadians: renderCtx.getUniformLocation(program, 'u_startAngleRadians'),
+        u_endAngleRadians: renderCtx.getUniformLocation(program, 'u_endAngleRadians'),
+        u_softnessRadians: renderCtx.getUniformLocation(program, 'u_softnessRadians'),
       }
     };
   }
