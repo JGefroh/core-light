@@ -26,8 +26,8 @@ export default class ViewportSystem extends System {
     this.secondaryViewportScale = 1;
     this.secondaryViewportMode = 'follow'
 
-    this.viewportMin = 0.03;
-    this.viewportMax = 1.4;
+    this.viewportMin = 0.5;
+    this.viewportMax = 5;
 
     this.followEntityId = null;
     this.primaryFollowEntityId = null;
