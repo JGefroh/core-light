@@ -28,6 +28,10 @@ export default class EnemyGeneratorSystem extends System {
             'armored': {shapeColor: 'rgba(255, 0, 35, 1)', maxMagnitude: 2, bleedAmount: 0.3, size: 20, health: 1000}
         }
 
+        if (window.location.href.indexOf('noenemy') != -1) {
+            return;
+        }
+        
         this.addHandler('CREATE_ENEMY', (payload) => {
             this._addEnemy(payload.xPosition, payload.yPosition, payload)
             if (this.enemyCount == null) {
