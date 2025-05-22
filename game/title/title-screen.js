@@ -418,13 +418,13 @@ function addDust() {
             particleCount: 1,
             particleLifetimeMin: 150000,
             particleLifetimeMax: 150000,
-            particleHeightMin: 1.2, //0.08 is pretty much the smallest
-            particleHeightMax: 0.2,
-            particleWidthMin: 1.2,
-            particleWidthMax: 0.2,
+            particleHeightMin: 0.5, //0.08 is pretty much the smallest
+            particleHeightMax: 1.2,
+            particleWidthMin: 0.5,
+            particleWidthMax: 1.2,
             particleColors: [`rgba(255, 255, 255, ${Math.random()}`],
             particleSpeedMin: 0.5,
-            particleSpeedMax: 5,
+            particleSpeedMax: 10,
             particleEmissionAngleDegreesMin: 0,
             particleEmissionAngleDegreesMax: 360
         });
