@@ -81,7 +81,7 @@ export default class Lightable extends Tag {
         return this.entity.getComponent('LightSourceComponent').padding
     }
 
-    shouldFlickerOff() {
+    shouldFlickerOff(dryRun) {
         if (this.getLightStyle() == 'off') {
             return true;
         }
@@ -99,7 +99,7 @@ export default class Lightable extends Tag {
         let flickerOffRandomMs = lightComponent.flickerOffRandomMs;
         let flickerOnRandomMs = lightComponent.flickerOnRandomMs;
 
-        if (!lastFlickerAt || Date.now() >= nextFlickerAt) {
+        if (!dryRun && (!lastFlickerAt || Date.now() >= nextFlickerAt)) {
             lightComponent.lastFlickerAt = Date.now()
 
             lightComponent.flickerStateOn = !lightComponent.flickerStateOn;
@@ -110,6 +110,9 @@ export default class Lightable extends Tag {
             else {
                 lightComponent.nextFlickerAt = Date.now() + (Math.random() * flickerOnRandomMs) + (flickerOnMinimumLengthMs)
             }
+        }
+        else if (dryRun) {
+            return (!lastFlickerAt || Date.now() >= nextFlickerAt);
         }
         return lightComponent.flickerStateOn;
     }

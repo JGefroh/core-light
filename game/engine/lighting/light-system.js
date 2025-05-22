@@ -46,9 +46,21 @@ export default class LightSystem extends System {
     }
 
     _updateLighting(layerCtx, viewport, renderer) {
+        let sounds = [
+            'switch-1.mp3',
+            'switch-2.mp3',
+            'switch-3.mp3',
+            'switch-4.mp3',
+        ]
         this.workForTag('Lightable', (lightable, entity) => {
             if (!lightable.isOn() && !this.forceRecalculateLight) {
                 return;
+            }
+            if (lightable.shouldFlickerOff(true) && !this.forceRecalculateLight) {
+                this.send("PLAY_AUDIO", {
+                    audioKey: this._randomFrom(sounds),
+                    volume: 0.2
+                });
             }
             if (lightable.shouldFlickerOff() && !this.forceRecalculateLight) {
                 return;
@@ -342,6 +354,9 @@ export default class LightSystem extends System {
             x: (dx / length) * amount,
             y: (dy / length) * amount
         };
+    }
+    _randomFrom(array) {
+        return array[Math.floor(Math.random() * array.length)];
     }
 } 
 
