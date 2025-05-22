@@ -43,49 +43,52 @@ const shaderSourceCode = `#version 300 es
     }
 
     void setColorForCone() {
-        vec2 dir = v_worldPos - u_center;
-        float dist = length(dir);
-        float angle = atan(dir.y, dir.x);
-        if (angle < 0.0) angle += 6.28318530718; // wrap [0, 2PI]
+        float angularVisibility = 1.0;
+        const float FULL_CIRCLE_RADIANS = 6.2831853;
 
-        float t_dist = clamp(dist / u_radius, 0.0, 1.0);
+        vec2 lightToFragment = v_worldPos - u_center; // light to fragment
+        float fragmentDistanceFromCenter = length(lightToFragment);
+        float normalizedRadialDistance = clamp(fragmentDistanceFromCenter / u_radius, 0.0, 1.0);
+        float fragmentAngle = atan(lightToFragment.y, lightToFragment.x);
 
-        // Angular soft mask
-        float visibility = 1.0;
+        if (fragmentAngle < 0.0) fragmentAngle += 6.2831853; // Wrap to [0, 2π]
 
+
+        // Apply angular falloff only for non-full-circle lights (cones)
         if (u_startAngleRadians != u_endAngleRadians) {
-            float TWO_PI = 6.2831853;
-            float normStart = mod(u_startAngleRadians, TWO_PI);
-            float normEnd = mod(u_endAngleRadians, TWO_PI);
-            float normAngle = mod(angle, TWO_PI);
+            float normalizedStartAngle = mod(u_startAngleRadians, FULL_CIRCLE_RADIANS);
+            float normalizedEndAngle   = mod(u_endAngleRadians, FULL_CIRCLE_RADIANS);
+            float angularSpan = mod(normalizedEndAngle - normalizedStartAngle + FULL_CIRCLE_RADIANS, FULL_CIRCLE_RADIANS);
+            float coneCenterAngle = mod(normalizedStartAngle + angularSpan * 0.5, FULL_CIRCLE_RADIANS);
+            float angleDifference = abs(fragmentAngle - coneCenterAngle);
 
-            float coneSpan = mod(normEnd - normStart + TWO_PI, TWO_PI);
-            float mid = mod(normStart + coneSpan * 0.5, TWO_PI);
+            angleDifference = min(angleDifference, FULL_CIRCLE_RADIANS - angleDifference);
 
-            float diff = abs(normAngle - mid);
-            diff = min(diff, TWO_PI - diff);
+            float fadeStart = angularSpan * 0.5 - u_softnessRadians;
+            float fadeEnd   = angularSpan * 0.5;
+            float edgeFade = smoothstep(fadeStart, fadeEnd, angleDifference);
 
-            float edgeFalloff = smoothstep(coneSpan * 0.5 - u_softnessRadians, coneSpan * 0.5, diff);
-
-            visibility = 1.0 - edgeFalloff;
+            angularVisibility = 1.0 - edgeFade;
         }
 
-        vec4 baseColor = u_colors[0];
-        for (int i = 0; i < u_stopCount - 1; ++i) {
-            float left = u_stops[i];
-            float right = u_stops[i + 1];
-            if (t_dist >= left && t_dist <= right) {
-                float f = (t_dist - left) / max((right - left), 0.0001);
-                baseColor = mix(u_colors[i], u_colors[i + 1], f);
+        vec4 finalColor = u_colors[0];
+
+        for (int stopIndex = 0; stopIndex < u_stopCount - 1; ++stopIndex) {
+            float stopStart = u_stops[stopIndex];
+            float stopEnd   = u_stops[stopIndex + 1];
+
+            if (normalizedRadialDistance >= stopStart && normalizedRadialDistance <= stopEnd) {
+                float segmentFraction = (normalizedRadialDistance - stopStart) / max(stopEnd - stopStart, 0.0001);
+                finalColor = mix(u_colors[stopIndex], u_colors[stopIndex + 1], segmentFraction);
                 break;
             }
         }
 
-        if (t_dist > u_stops[u_stopCount - 1]) {
-            baseColor = u_colors[u_stopCount - 1];
+        if (normalizedRadialDistance > u_stops[u_stopCount - 1]) {
+            finalColor = u_colors[u_stopCount - 1];
         }
 
-        o_color = baseColor * visibility;
+        o_color = finalColor * angularVisibility;
     }
     
 
