@@ -256,18 +256,19 @@ export default class WeaponEffectSystem extends System {
       particleEmitFrequencyInMs: 0,
       particleEmissionCyclesMax: 1,
       particleShape: 'circle',
-      particleCount: 10,
-      particleLifetimeMin: 30000,
+      particleCount: 20,
+      particleLifetimeMin: 45000,
       particleLifetimeMax: 60000,
-      particleHeightMin: 0.08, //0.08 is pretty much the smallest
+      particleHeightMin: 0.12, //0.08 is pretty much the smallest
       particleHeightMax: 0.2,
-      particleWidthMin: 0.08,
+      particleWidthMin: 0.12,
       particleWidthMax: 0.2,
       particleColors: [`rgba(255, 255, 255, ${Math.random()}`],
-      particleSpeedMin: 0,
+      particleSpeedMin: 0.1,
       particleSpeedMax: 20,
-      particleEmissionAngleDegreesMin: angleDegrees - 20,
-      particleEmissionAngleDegreesMax: angleDegrees + 20,
+      particleEmissionAngleDegreesMin: 0,
+      particleEmissionAngleDegreesMax: 360,
+      particleSpawnRadius: 30,
     });
   }
 }
