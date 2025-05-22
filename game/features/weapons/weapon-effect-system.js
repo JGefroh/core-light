@@ -259,10 +259,10 @@ export default class WeaponEffectSystem extends System {
       particleCount: 20,
       particleLifetimeMin: 45000,
       particleLifetimeMax: 60000,
-      particleHeightMin: 0.12, //0.08 is pretty much the smallest
-      particleHeightMax: 0.2,
-      particleWidthMin: 0.12,
-      particleWidthMax: 0.2,
+      particleHeightMin: 0.16, //0.08 is pretty much the smallest
+      particleHeightMax: 0.25,
+      particleWidthMin: 0.16,
+      particleWidthMax: 0.25,
       particleColors: [`rgba(255, 255, 255, ${Math.random()}`],
       particleSpeedMin: 0.1,
       particleSpeedMax: 20,
