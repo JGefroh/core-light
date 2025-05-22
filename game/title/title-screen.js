@@ -167,6 +167,7 @@ function addEntities() {
     addDebris();
     addShelf();
     addDust();
+    startTone();
 }
 
 function resetSystems() {
@@ -430,6 +431,23 @@ function addDust() {
         });
     }
     
+}
+
+function startTone() {
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+
+    const oscillator = context.createOscillator();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(80, context.currentTime); // 80 Hz
+    
+    const gainNode = context.createGain();
+    gainNode.gain.setValueAtTime(0.05, context.currentTime); // volume (0.0 to 1.0)
+    
+    // Connect nodes
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+    
+    oscillator.start();
 }
 
 function _randomFrom(array) {
