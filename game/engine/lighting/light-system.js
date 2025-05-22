@@ -15,6 +15,7 @@ export default class LightSystem extends System {
                 layerRenderLibrary: 'webgl2', // 2d is interestingly faster than canvas
                 applyOptions: {
                     globalCompositeOperation: 'multiply',
+                    filter: 'blur(4px)'
                 },
                 render: this._render.bind(this)
             })
