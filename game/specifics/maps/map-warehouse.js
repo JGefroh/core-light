@@ -102,6 +102,7 @@ const map = {
         {type: 'CARDBOARD_BOX_FLAT_RANDOM', xPosition: 45, yPosition: -200, width: 20, height: 20, angleDegrees: 'random' }, // box
         {type: 'CARDBOARD_BOX_FLAT_RANDOM', xPosition: 140, yPosition: 50, width: 20, height: 20, angleDegrees: 'random' }, // box
         {type: 'CARDBOARD_BOX_FLAT_RANDOM', xPosition: 140, yPosition: 60, width: 20, height: 20, angleDegrees: 'random' }, // box
+        {type: 'CARDBOARD_BOX_FLAT_RANDOM', xPosition: 390, yPosition: -140, width: 20, height: 20, angleDegrees: 'random' }, // box
         {type: 'CARDBOARD_BOX_FLAT_RANDOM', xPosition: 400, yPosition: 60, width: 20, height: 20, angleDegrees: 'random' }, // box
         {type: 'CARDBOARD_BOX_FLAT_RANDOM', xPosition: 550, yPosition: -240, width: 20, height: 20, angleDegrees: 'random' }, // box
 
@@ -122,7 +123,7 @@ const map = {
         {xPosition: 115, yPosition: -310, type: 'normal_fast'}, // Left Truck
         {xPosition: 130, yPosition: -310, type: 'normal_fast'}, // Left Truck
         {xPosition: 145, yPosition: -310, type: 'normal_fast'}, // Left Truck
-        {xPosition: 550, yPosition: 0, type: 'normal_fast'},
+        {xPosition: 570, yPosition: 0, type: 'normal_fast'},
         {xPosition: 210, yPosition: -20, type: 'normal_fast'},
         {xPosition: 180, yPosition: -250},
         {xPosition: 500, yPosition: 20},
