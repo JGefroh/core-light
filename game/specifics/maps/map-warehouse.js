@@ -24,7 +24,9 @@ const map = {
         {offset: [60, 0], color: '#808080', size: 8},
         {offset: [0, 150], color: '#808080', size: 8},
         {offset: [100, 0]},
-        {offset: [0, 390]},
+        {offset: [0, 95]},
+        {offset: [0, 32], clear: true},
+        {offset: [0, 265]},
         {offset: [-620, 0]},
         {offset: [0, -90]},
     ],
@@ -91,7 +93,7 @@ const map = {
         {type: 'CARDBOARD_BOX', xPosition: 140, yPosition: -420, width: 30, height: 20, angleDegrees: 90, collision: 'wall' }, // box
         {type: 'CARDBOARD_BOX', xPosition: 120, yPosition: -390, width: 20, height: 20, angleDegrees: 90, collision: 'wall' }, // box
         {type: 'CARDBOARD_BOX', xPosition: 140, yPosition: -390, width: 20, height: 20, angleDegrees: 90, collision: 'wall' }, // box
-        {type: 'METAL_VENT_TOP', xPosition: 620, yPosition: -270, width: 16, height: 32, collision: 'wall' },
+        {type: 'LIGHT_FIXTURE', xPosition: 627, yPosition: -190, width: 30, height: 32, collision: 'wall' },
 
         {type: 'METAL_SHELF_FRONT', xPosition: 60, yPosition: 30, width: 80, height: 80, collision: 'wall', angleDegrees: 20 },
 
@@ -102,11 +104,13 @@ const map = {
         {type: 'CARDBOARD_BOX_FLAT_RANDOM', xPosition: 140, yPosition: 60, width: 20, height: 20, angleDegrees: 'random' }, // box
         {type: 'CARDBOARD_BOX_FLAT_RANDOM', xPosition: 400, yPosition: 60, width: 20, height: 20, angleDegrees: 'random' }, // box
         {type: 'CARDBOARD_BOX_FLAT_RANDOM', xPosition: 550, yPosition: -240, width: 20, height: 20, angleDegrees: 'random' }, // box
+
     ],
     lights: [
         {xPosition: 15, yPosition: -300, type: 'cone', radius: 300, angleDegrees: 45, coneDegrees: 50},
         {xPosition: 15, yPosition: -300, type: 'point', radius: 10, angleDegrees: 45},
         {xPosition: 340, yPosition: 80, type: 'cone', radius: 130, angleDegrees: -90, coneDegrees: 130},
+        {xPosition: 660, yPosition: -200, type: 'cone', radius: 260, angleDegrees: 180, coneDegrees: 40}, //vent light
 
         // INTRO AREA
     ],
