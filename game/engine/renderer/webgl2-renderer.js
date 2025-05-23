@@ -1,5 +1,8 @@
 import { default as System } from '@core/system';
 import Colors from '../util/colors';
+
+import { compileShader } from './util/shader-util';
+
 import { default as quadVertexShaderSourceCode } from './shaders/quad-vertex-shader';
 import { default as quadFragmentShaderSourceCode } from './shaders/quad-fragment-shader';
 import { default as quadAsCircleFragmentShaderSourceCode } from './shaders/quad-as-circle-fragment-shader';
@@ -7,6 +10,7 @@ import { default as quadAsLightFragmentShaderSourceCode } from './shaders/quad-a
 import { default as pathFragmentShaderSourceCode } from './shaders/path-fragment-shader';
 import { default as pathRadialFragmentShaderSourceCode } from './shaders/path-radial-fragment-shader';
 import { default as pathVertexShaderSourceCode } from './shaders/path-vertex-shader';
+import LightPathProgram from './webgl2-programs/light-path-program';
 
 export default class WebGl2Renderer {
 
@@ -40,8 +44,7 @@ export default class WebGl2Renderer {
     this._initializePathBuffers(renderCtx);
 
     //Paths for Raycast Light
-    this._initializeLightPathProgram(renderCtx);
-    this._initializeLightPathBuffers(renderCtx);
+    this._initializeRaycastLightProgram(renderCtx);
 
     this.colorUtil = new Colors();
   }
@@ -166,19 +169,18 @@ export default class WebGl2Renderer {
   }) {
     if (!pathPoints?.length) return;
 
-    const vao = this.vertexArrayObjects['LIGHT_PATH'];
+    const vao = this.programs['LIGHT_PATH'].getVertexArrayObjects();
     renderCtx.bindVertexArray(vao);
-    const program = this.programs['LIGHT_PATH'];
+    const program = this.programs['LIGHT_PATH'].getProgram();
     renderCtx.useProgram(program.program);
 
     const vertices = this._triangulatePath(pathPoints, xPosition, yPosition);
-    const buffer = this.buffers['LIGHT_PATH'];
+    const buffer = this.programs['LIGHT_PATH'].getBuffers();
     renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, buffer);
     renderCtx.bufferData(renderCtx.ARRAY_BUFFER, vertices, renderCtx.STATIC_DRAW);
 
     const projectionMatrix = this._buildProjectionMatrix(renderCtx, viewport);
     renderCtx.uniformMatrix4fv(program.uniforms.u_projectionMatrix, false, projectionMatrix);
-
 
     // Gradient (for in to out fuzziness)
     const { stopCount, stops, colors } = this._parseGradientStops(fill);
@@ -341,10 +343,10 @@ export default class WebGl2Renderer {
     // Buffered
     const program = renderCtx.createProgram();
 
-    let quadVertexShader = this._compileShader(renderCtx, quadVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
+    let quadVertexShader = compileShader(renderCtx, quadVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
     renderCtx.attachShader(program, quadVertexShader);
 
-    let quadFragmentShader = this._compileShader(renderCtx, quadFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
+    let quadFragmentShader = compileShader(renderCtx, quadFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
     renderCtx.attachShader(program, quadFragmentShader);
 
     renderCtx.linkProgram(program);
@@ -362,10 +364,10 @@ export default class WebGl2Renderer {
     // Buffered
     const program = renderCtx.createProgram();
 
-    let quadVertexShader = this._compileShader(renderCtx, quadVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
+    let quadVertexShader = compileShader(renderCtx, quadVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
     renderCtx.attachShader(program, quadVertexShader);
 
-    let quadAsCircleFragmentShader = this._compileShader(renderCtx, quadAsCircleFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
+    let quadAsCircleFragmentShader = compileShader(renderCtx, quadAsCircleFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
     renderCtx.attachShader(program, quadAsCircleFragmentShader);
 
     renderCtx.linkProgram(program);
@@ -383,10 +385,10 @@ export default class WebGl2Renderer {
     // Buffered
     const program = renderCtx.createProgram();
 
-    let pathVertexShader = this._compileShader(renderCtx, pathVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
+    let pathVertexShader = compileShader(renderCtx, pathVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
     renderCtx.attachShader(program, pathVertexShader);
 
-    let pathFragmentShader = this._compileShader(renderCtx, pathFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
+    let pathFragmentShader = compileShader(renderCtx, pathFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
     renderCtx.attachShader(program, pathFragmentShader);
 
     renderCtx.linkProgram(program);
@@ -401,14 +403,15 @@ export default class WebGl2Renderer {
     }
   }
 
+
   _initializeLightProgram(renderCtx) {
     // Buffered
     const program = renderCtx.createProgram();
 
-    let quadVertexShader = this._compileShader(renderCtx, quadVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
+    let quadVertexShader = compileShader(renderCtx, quadVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
     renderCtx.attachShader(program, quadVertexShader);
 
-    let quadAsLightFragmentShader = this._compileShader(renderCtx, quadAsLightFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
+    let quadAsLightFragmentShader = compileShader(renderCtx, quadAsLightFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
     renderCtx.attachShader(program, quadAsLightFragmentShader);
 
     renderCtx.linkProgram(program);
@@ -422,35 +425,10 @@ export default class WebGl2Renderer {
     }
   }
 
-  _initializeLightPathProgram(renderCtx) {
-    const program = renderCtx.createProgram();
-
-    const vertexShader = this._compileShader(renderCtx, pathVertexShaderSourceCode, renderCtx.VERTEX_SHADER);
-    renderCtx.attachShader(program, vertexShader);
-
-    const fragmentShader = this._compileShader(renderCtx, pathRadialFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER);
-    renderCtx.attachShader(program, fragmentShader);
-
-    renderCtx.linkProgram(program);
-
-    this.programs['LIGHT_PATH'] = {
-      program: program,
-      attributes: {
-        a_position: renderCtx.getAttribLocation(program, 'a_position'),
-      },
-      uniforms: {
-        u_projectionMatrix: renderCtx.getUniformLocation(program, 'u_projectionMatrix'),
-        u_center: renderCtx.getUniformLocation(program, 'u_center'),
-        u_radius: renderCtx.getUniformLocation(program, 'u_radius'),
-        u_stopCount: renderCtx.getUniformLocation(program, 'u_stopCount'),
-        u_stops: renderCtx.getUniformLocation(program, 'u_stops'),
-        u_colors: renderCtx.getUniformLocation(program, 'u_colors'),
-        u_isCone: renderCtx.getUniformLocation(program, 'u_isCone'), 
-        u_startAngleRadians: renderCtx.getUniformLocation(program, 'u_startAngleRadians'),
-        u_endAngleRadians: renderCtx.getUniformLocation(program, 'u_endAngleRadians'),
-        u_softnessRadians: renderCtx.getUniformLocation(program, 'u_softnessRadians'),
-      }
-    };
+  _initializeRaycastLightProgram(renderCtx) {
+    let program = new LightPathProgram();
+    program.initialize(renderCtx);
+    this.programs['LIGHT_PATH'] = program;
   }
 
   _initializeBuffers(renderCtx, programType) {
@@ -581,47 +559,6 @@ export default class WebGl2Renderer {
     // Cleanup
     renderCtx.bindVertexArray(null);
     renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, null);
-  }
-
-  _initializeLightPathBuffers(renderCtx) {
-    const vao = renderCtx.createVertexArray();
-    renderCtx.bindVertexArray(vao);
-    this.vertexArrayObjects['LIGHT_PATH'] = vao;
-
-    // Shader program for radial fill
-    const program = this.programs['LIGHT_PATH'];
-    renderCtx.useProgram(program.program);
-
-    // Create and upload vertex buffer
-    const buffer = this.buffers['LIGHT_PATH'] ||= renderCtx.createBuffer();
-    renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, buffer);
-    renderCtx.bufferData(renderCtx.ARRAY_BUFFER, this.maxBufferSize, renderCtx.STATIC_DRAW);
-
-    // Set attribute
-    const locPosition = renderCtx.getAttribLocation(program.program, 'a_position');
-    renderCtx.enableVertexAttribArray(locPosition);
-    renderCtx.vertexAttribPointer(locPosition, 2, renderCtx.FLOAT, false, 0, 0);
-    renderCtx.vertexAttribDivisor(locPosition, 0); // per-vertex
-
-    // Blending: additive
-    renderCtx.enable(renderCtx.BLEND);
-    renderCtx.blendFunc(renderCtx.SRC_ALPHA, renderCtx.ONE_MINUS_SRC_ALPHA);
-
-    // Cleanup
-    renderCtx.bindVertexArray(null);
-    renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, null);
-  }
-
-
-  /// WEBGL2 Required Utilities
-  _compileShader(renderCtx, sourceCode, type) {
-    const shader = renderCtx.createShader(type); // VERTEX_SHADER or FRAGMENT_SHADER
-    renderCtx.shaderSource(shader, sourceCode);
-    renderCtx.compileShader(shader);
-    if (!renderCtx.getShaderParameter(shader, renderCtx.COMPILE_STATUS)) {
-      throw new Error(renderCtx.getShaderInfoLog(shader));
-    }
-    return shader;
   }
 
   _buildProjectionMatrix(renderCtx, viewport) {
