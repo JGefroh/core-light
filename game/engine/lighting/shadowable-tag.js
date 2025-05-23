@@ -9,7 +9,7 @@ export default class Shadow extends Tag {
     }
 
     static isAssignableTo(entity) {
-        return entity.hasComponent('ShadowComponent')
+        return entity.hasComponent('ShadowComponent') && entity.hasComponent('PositionComponent')
     }
 
     getRectangleEdgesCache() {
@@ -18,5 +18,21 @@ export default class Shadow extends Tag {
 
     setRectangleEdgesCache(edges) {
         this.entity.getComponent('ShadowComponent').rectangleEdgesCache = edges;
+    }
+    
+    getWidth() {
+        return this.entity.getComponent('PositionComponent').width;
+    }
+
+    getHeight() {
+        return this.entity.getComponent('PositionComponent').height;
+    }
+
+    getXPosition() {
+        return this.entity.getComponent('PositionComponent').xPosition;
+    }
+
+    getYPosition() {
+        return this.entity.getComponent('PositionComponent').yPosition;
     }
 } 

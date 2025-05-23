@@ -3,7 +3,7 @@ import { default as System } from '@core/system';
 export default class DebugUiSystem extends System {
     constructor() {
         super();
-        if (window.location.href.indexOf('debug') != -1) {
+        if (window.location.href.indexOf('debug2') != -1) {
           setTimeout(() => {
               this.send('ADD_GUI_RENDERABLE', {
                   key: `debug-coordinates-viewport`,

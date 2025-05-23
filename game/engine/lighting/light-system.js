@@ -12,7 +12,7 @@ export default class LightSystem extends System {
         if (window.location.href.indexOf('nolight') == -1) {
             this.send("REGISTER_RENDER_LAYER", {
                 layer: 'LIGHTING',
-                layerRenderLibrary: 'webgl2', // 2d is interestingly faster than canvas
+                layerRenderLibrary: 'webgl2', 
                 applyOptions: {
                     globalCompositeOperation: 'multiply',
                     filter: 'blur(4px)'
@@ -108,10 +108,6 @@ export default class LightSystem extends System {
         lightable.setRays(rays);
     }
 
-    _getConsistentJitter(lightable, index, jitterAmount = 0.01) {
-        return ((((lightable.getXPosition() * 73856093 + lightable.getYPosition() * 19349663 + index * 83492791) % 1000) / 1000) - 0.5) * 2 * jitterAmount;
-    }
-
     _calculateRaysForSelfIllumination(lightable) {
         const sourceX = lightable.getXPosition();
         const sourceY = lightable.getYPosition();
@@ -150,6 +146,10 @@ export default class LightSystem extends System {
     
         this.workForTag('Shadowable', (shadowable, entity) => {
             if (shadowable.getEntity() === lightable.getEntity()) return;
+
+            if (this._shouldIgnoreShadowable(lightable, shadowable)) {
+                return;
+            }
             
             renderable.setEntity(entity);
 
@@ -176,6 +176,17 @@ export default class LightSystem extends System {
         }
 
         return {x: finalX, y: finalY};
+    }
+
+    _shouldIgnoreShadowable(lightable, shadowable) {
+        const dx = shadowable.getXPosition() - lightable.getXPosition();
+        const dy = shadowable.getYPosition() - lightable.getYPosition();
+        const entityRadius = Math.hypot(shadowable.getWidth(), shadowable.getHeight()) / 2;
+        const maxReach = lightable.getMaxDistance() + entityRadius;
+
+        if ((dx * dx + dy * dy) > (maxReach * maxReach)) {
+            return true;
+        }
     }
 
     _getCacheEdges(shadowable, renderable) {
