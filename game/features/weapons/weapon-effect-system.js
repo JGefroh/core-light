@@ -256,7 +256,7 @@ export default class WeaponEffectSystem extends System {
       particleEmitFrequencyInMs: 0,
       particleEmissionCyclesMax: 1,
       particleShape: 'circle',
-      particleCount: 20,
+      particleCount: 10,
       particleLifetimeMin: 45000,
       particleLifetimeMax: 60000,
       particleHeightMin: 0.16, //0.08 is pretty much the smallest
