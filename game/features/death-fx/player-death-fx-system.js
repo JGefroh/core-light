@@ -169,7 +169,7 @@ export default class PlayerDeathFxSystem extends System {
             flickerOffRandomMs: 200,
             flickerOnRandomMs: 100,
             flickerOnMinimumLengthMs: 1000,
-            maxDistance: 350,
+            maxDistance: 200,
             coneDegrees: 45,
         }))
         entity.addComponent(new CollisionComponent({
@@ -183,7 +183,7 @@ export default class PlayerDeathFxSystem extends System {
         entity.addComponent(new TimerComponent({
             time: 300,
             onEndEffect: () => {
-                vector.bleedAmount = 0.05;
+                vector.bleedAmount = 0.06;
             }
         }));
         entity.addComponent(vector);

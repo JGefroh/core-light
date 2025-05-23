@@ -49,7 +49,7 @@ export default class WeaponEffectSystem extends System {
     ));
     entity.addComponent(new LightSourceComponent({
       lightType: 'point',
-      maxDistance: 50,
+      maxDistance: 100,
       lightStyle: 'flicker'
     }))
     entity.addComponent(new TimerComponent({
