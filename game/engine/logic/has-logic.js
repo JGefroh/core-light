@@ -15,4 +15,8 @@ export default class HasLogic extends Tag {
     getRules() {
         return this.entity.getComponent('LogicComponent').rules;
     }
+
+    deactivateRule(rule) {
+        rule.status = 'inactive'
+    }
 } 

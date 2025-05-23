@@ -66,7 +66,7 @@ export default class ParticleSystem extends System {
             particleEmissionAngleDegreesMax,
             particleSpawnRadius = 0,
         } = emitter;
-    
+
         for (let i = 0; i < particleCount; i++) {
             const lifetime = this._rand(particleLifetimeMin, particleLifetimeMax);
             const width = this._rand(particleWidthMin, particleWidthMax);

@@ -250,25 +250,6 @@ export default class WeaponEffectSystem extends System {
   }
 
   addDust(x, y, angleDegrees) {
-    this._core.send('EMIT_PARTICLES', {
-      xPosition: x,
-      yPosition: y,
-      particleEmitFrequencyInMs: 0,
-      particleEmissionCyclesMax: 1,
-      particleShape: 'circle',
-      particleCount: 10,
-      particleLifetimeMin: 45000,
-      particleLifetimeMax: 60000,
-      particleHeightMin: 0.16, //0.08 is pretty much the smallest
-      particleHeightMax: 0.25,
-      particleWidthMin: 0.16,
-      particleWidthMax: 0.25,
-      particleColors: [`rgba(255, 255, 255, ${Math.random()}`],
-      particleSpeedMin: 0.1,
-      particleSpeedMax: 20,
-      particleEmissionAngleDegreesMin: 0,
-      particleEmissionAngleDegreesMax: 360,
-      particleSpawnRadius: 30,
-    });
+    this._core.send('REQUEST_DUST_FX', { xPosition: x, yPosition: y})
   }
 }

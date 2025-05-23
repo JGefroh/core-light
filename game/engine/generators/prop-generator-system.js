@@ -63,17 +63,15 @@ export default class PropGeneratorSystem extends System {
         const propDetails = this.propMap[propRequestType];
 
         if (propDetails.parts) {
-    
-            if (propRequest.shadow || propRequest.collision) {
-                this._createShadowProp(
-                    propRequest.xPosition,
-                    propRequest.yPosition,
-                    propRequest.width,
-                    propRequest.height,
-                    propAngle,
-                    propRequest
-                );
-            }
+            this._createShadowProp(
+                propRequestType,
+                propRequest.xPosition,
+                propRequest.yPosition,
+                propRequest.width,
+                propRequest.height,
+                propAngle,
+                propRequest
+            );
             propDetails.parts.forEach((part) => {
                 const scaleX = propRequest.width / propDetails.width;
                 const scaleY = propRequest.height / propDetails.height;
@@ -161,8 +159,8 @@ export default class PropGeneratorSystem extends System {
         this._core.addEntity(entity);
     }
 
-    _createShadowProp(xPosition, yPosition, width, height, angleDegrees, options) {
-        let entity = new Entity()
+    _createShadowProp(propType, xPosition, yPosition, width, height, angleDegrees, options) {
+        let entity = new Entity({type: propType})
         entity.addComponent(new PositionComponent(
             {
                 width: width,

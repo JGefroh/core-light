@@ -100,6 +100,7 @@ import TrailEmitter from '../features/trail-fx/trail-emitter-tag';
 import DoorSystem from '../features/door/door-system';
 import Door from '../features/door/door-tag';
 import DoorOpener from '../features/door/door-opener';
+import DustParticleFxSystem from '../features/fx/dust-particle-fx-system';
 
 export function startGame() {
 
@@ -215,6 +216,7 @@ export function startGame() {
     Core.addSystem(new TrailSystem());
         Core.addTag(TrailZone);
         Core.addTag(TrailEmitter);
+    Core.addSystem(new DustParticleFxSystem())
 
 
     // Prop Logic

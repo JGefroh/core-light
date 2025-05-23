@@ -11,6 +11,13 @@ const configuration = {
             effects: [
                 {type: 'REGISTER_DOOR', params: {}}
             ],
+        },
+        "dust": {
+            conditions: [],
+            effects: [
+                {type: 'REQUEST_DUST_FX', params: { particleCount: 20, respectAngle: true, particleEmissionCyclesMax: 3}}
+            ],
+            frequency: 'once'
         }
     },
     entityRules: {
@@ -18,7 +25,8 @@ const configuration = {
         BLOOD_POOL_2: { rules: ['footstep_trail'] },
         BLOOD_POOL_3: { rules: ['footstep_trail'] },
         BLOOD_POOL_4: { rules: ['footstep_trail'] },
-        METAL_DOOR: { rules: ['door'] }
+        METAL_DOOR: { rules: ['door'] },
+        LIGHT_FIXTURE: { rules: ['dust'] }
     }
     
 }

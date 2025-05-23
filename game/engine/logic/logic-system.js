@@ -3,7 +3,9 @@ import LogicComponent from './logic-component';
 
 /**
  * 
- * Condition: {type: 'condition_type', params: {}}
+ * Condition: {type: 'condition_type', params: {
+ *  frequency: 'once' | ?
+ * }}
  * 
  */
 export default class LogicSystem extends System {
@@ -20,17 +22,26 @@ export default class LogicSystem extends System {
       this.addHandler('CORE_ENTITY_CREATED', (payload) => {
         let rules = this.autoApplyTo[payload.entity.getType()];
         if (rules) {
-            payload.entity.addComponent(new LogicComponent({rules: rules}));
+            let duplicatedRules = JSON.parse(JSON.stringify(rules))
+            payload.entity.addComponent(new LogicComponent({rules: duplicatedRules}));
         }
       });
     }
-  
+    
     work() {
         this.workForTag('HasLogic', (tag) => {
             let rules = tag.getRules();
             rules.forEach((rule) => {
+                if (rule.status == 'inactive') {
+                    return false;
+                }
                 if (this._checkRuleConditions(rule, tag.getEntity())) {
                     this._executeEffect(rule, tag.getEntity());
+
+                    if (rule.frequency == 'once') {
+                        tag.deactivateRule(rule);
+                        return;
+                    }
                 }
             });
         });
