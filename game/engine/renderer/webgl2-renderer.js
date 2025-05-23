@@ -11,6 +11,7 @@ import { default as pathFragmentShaderSourceCode } from './shaders/path-fragment
 import { default as pathRadialFragmentShaderSourceCode } from './shaders/path-radial-fragment-shader';
 import { default as pathVertexShaderSourceCode } from './shaders/path-vertex-shader';
 import LightPathProgram from './webgl2-programs/light-path-program';
+import PathProgram from './webgl2-programs/path-program';
 
 export default class WebGl2Renderer {
 
@@ -33,17 +34,15 @@ export default class WebGl2Renderer {
 
     this.perFrameCache = {}
 
-    // Quads for Shapes
+    // Quads for Shapes - old programs
     this._initializeQuadProgram(renderCtx)
     this._initializeCircleProgram(renderCtx)
     this._initializeLightProgram(renderCtx)
     this._initializeQuadBuffers(renderCtx)
 
-    //Paths for shapes
-    this._initializePathProgram(renderCtx)
-    this._initializePathBuffers(renderCtx);
 
-    //Paths for Raycast Light
+    // Refactored programs
+    this._initializePathProgram(renderCtx);
     this._initializeRaycastLightProgram(renderCtx);
 
     this.colorUtil = new Colors();
@@ -132,13 +131,13 @@ export default class WebGl2Renderer {
     if (!pathPoints?.length) return;
 
     // Bind the array and use the program
-    const vao = this.vertexArrayObjects['PATH'];
+    const vao = this.programs['PATH'].getVertexArrayObjects();
     renderCtx.bindVertexArray(vao);
-    const program = this.programs['PATH'];
+    const program = this.programs['PATH'].getProgram();
     renderCtx.useProgram(program.program);
 
     const flatPoints = new Float32Array(pathPoints.flatMap(p => [p.x, p.y]));
-    const buffer = this.buffers['PATH'];
+    const buffer = this.programs['PATH'].getBuffers();
 
     renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, buffer);
     renderCtx.bufferData(renderCtx.ARRAY_BUFFER, flatPoints, renderCtx.DYNAMIC_DRAW);
@@ -382,25 +381,9 @@ export default class WebGl2Renderer {
   }
 
   _initializePathProgram(renderCtx) {
-    // Buffered
-    const program = renderCtx.createProgram();
-
-    let pathVertexShader = compileShader(renderCtx, pathVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
-    renderCtx.attachShader(program, pathVertexShader);
-
-    let pathFragmentShader = compileShader(renderCtx, pathFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
-    renderCtx.attachShader(program, pathFragmentShader);
-
-    renderCtx.linkProgram(program);
-
-    this.programs['PATH'] = {
-      program: program,
-      attributes: {},
-      uniforms: {
-        u_projectionMatrix: renderCtx.getUniformLocation(program, 'u_projectionMatrix'),
-        u_color: renderCtx.getUniformLocation(program, 'u_color')
-      }
-    }
+    let program = new PathProgram();
+    program.initialize(renderCtx);
+    this.programs['PATH'] = program;
   }
 
 
@@ -530,35 +513,6 @@ export default class WebGl2Renderer {
   _initializeQuadBuffers(renderCtx) {
     this._initializeBuffers(renderCtx, 'QUAD')
     this._initializeBuffers(renderCtx, 'CIRCLE')
-  }
-
-  _initializePathBuffers(renderCtx) {
-    const vao = renderCtx.createVertexArray();
-    renderCtx.bindVertexArray(vao);
-    this.vertexArrayObjects['PATH'] = vao;
-
-    // Shader program for radial fill
-    const program = this.programs['PATH'];
-    renderCtx.useProgram(program.program);
-
-    // Create and upload vertex buffer
-    const buffer = this.buffers['PATH'] ||= renderCtx.createBuffer();
-    renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, buffer);
-    renderCtx.bufferData(renderCtx.ARRAY_BUFFER, 0, renderCtx.STATIC_DRAW);
-
-    // Set attribute
-    const locPosition = renderCtx.getAttribLocation(program.program, 'a_position');
-    renderCtx.enableVertexAttribArray(locPosition);
-    renderCtx.vertexAttribPointer(locPosition, 2, renderCtx.FLOAT, false, 0, 0);
-    renderCtx.vertexAttribDivisor(locPosition, 0); // per-vertex
-
-    // Blending: additive
-    renderCtx.enable(renderCtx.BLEND);
-    renderCtx.blendFunc(renderCtx.SRC_ALPHA, renderCtx.ONE_MINUS_SRC_ALPHA);
-
-    // Cleanup
-    renderCtx.bindVertexArray(null);
-    renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, null);
   }
 
   _buildProjectionMatrix(renderCtx, viewport) {
