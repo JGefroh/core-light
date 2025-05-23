@@ -27,11 +27,6 @@ const map = {
         {offset: [0, 390]},
         {offset: [-620, 0]},
         {offset: [0, -90]},
-
-        // INTRO AREA
-        {from: [90, -449], to: [90, -600]},
-        {offset: [440, 0]},
-        {offset: [0, 150]},
     ],
     props: [
         {type: 'METAL_SHELF_TOP', xPosition: 130, yPosition: -100, width: 40, height: 150, shadow: true, collision: 'wall', hitscan: true }, //shelf
@@ -114,7 +109,6 @@ const map = {
         {xPosition: 340, yPosition: 80, type: 'cone', radius: 130, angleDegrees: -90, coneDegrees: 130},
 
         // INTRO AREA
-        {xPosition: 300, yPosition: -600, type: 'point', radius: 400},
     ],
     enemies: [
         {xPosition: 40, yPosition: -50, type: 'normal'},

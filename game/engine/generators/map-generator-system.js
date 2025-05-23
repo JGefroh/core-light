@@ -23,6 +23,9 @@ export default class MapGeneratorSystem extends System {
     }
 
     loadMap(map) {
+        map.xPosition ||= 0;
+        map.yPosition ||= 0;
+
         this._addFloors(map);
         this._addWalls(map);
         this._addProps(map);
@@ -33,8 +36,8 @@ export default class MapGeneratorSystem extends System {
     _addFloors(map) {
         map.floors.forEach((floor) => {
             this._addFloor({
-                xPosition: floor.xPosition,
-                yPosition: floor.yPosition,
+                xPosition: floor.xPosition + map.xPosition,
+                yPosition: floor.yPosition + map.yPosition,
                 width: floor.width,
                 height: floor.height,
                 color: floor.color
@@ -83,8 +86,8 @@ export default class MapGeneratorSystem extends System {
             if (!wall.clear) {
                 // A clear slot doesn't have a wall.
                 this._addWall({
-                    xPosition: centerX,
-                    yPosition: centerY,
+                    xPosition: centerX + map.xPosition,
+                    yPosition: centerY + map.yPosition,
                     width: width,
                     height: height,
                     color: color
@@ -99,13 +102,15 @@ export default class MapGeneratorSystem extends System {
         map.props.forEach((prop) => {
             if (!prop.type) {
                 this._addProp({
-                    xPosition: prop.xPosition,
-                    yPosition: prop.yPosition,
+                    xPosition: prop.xPosition + map.xPosition,
+                    yPosition: prop.yPosition + map.yPosition,
                     width: prop.width,
                     height: prop.height
                 });
             }
             else {
+                prop.xPosition += map.xPosition;
+                prop.yPosition += map.yPosition;
                 this.send('CREATE_PROP', prop)
             }
             
@@ -114,8 +119,8 @@ export default class MapGeneratorSystem extends System {
     _addLights(map) {
         map.lights.forEach((light) => {
             this._addLight({
-                xPosition: light.xPosition,
-                yPosition: light.yPosition,
+                xPosition: light.xPosition + map.xPosition,
+                yPosition: light.yPosition + map.yPosition,
                 radius: light.radius,
                 type: light.type,
                 angleDegrees: light.angleDegrees,
@@ -126,6 +131,8 @@ export default class MapGeneratorSystem extends System {
 
     _addEnemies(map) {
         map.enemies.forEach((enemy) => {
+            enemy.xPosition += map.xPosition;
+            enemy.yPosition += map.yPosition;
             this.send('CREATE_ENEMY', enemy)
         });
     }

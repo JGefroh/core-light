@@ -4,10 +4,14 @@ const manifest = {
     },
     props: {
         'METAL_SHELF_FRONT': { path: 'prop-shelf-front.png' },
+        'BARRIER_1': { path: 'barrier-1.png' },
         'BLOOD_POOL_1': { path: 'blood-pool-1.png' },
         'BLOOD_POOL_2': { path: 'blood-pool-2.png' },
         'BLOOD_POOL_3': { path: 'blood-pool-3.png' },
         'BLOOD_POOL_4': { path: 'blood-pool-4.png' },
+        'CAR_1': { path: 'car-1.png' },
+        'CAR_2': { path: 'car-2.png' },
+        'DUMPSTER_FRONT': { path: 'dumpster-front.png'},
         'MEAT_CHUNK_1': { path: 'meat-chunk-1.png'},
         'MEAT_CHUNK_2': { path: 'meat-chunk-2.png'},
         'MEAT_CHUNK_3': { path: 'meat-chunk-3.png'},
@@ -27,6 +31,7 @@ const manifest = {
         'PROP_METAL_SHELF_TOP': { path: 'prop-metal-shelf-top.json' },
         'PROP_METAL_VENT_TOP': { path: 'prop-metal-vent-top.json' },
         'PROP_PALLET': { path: 'prop-pallet.json' },
+        'PROP_PARKING_PAINT_LINE': { path: 'prop-parking-paint-line.json'}
     }
 }
 export default manifest;

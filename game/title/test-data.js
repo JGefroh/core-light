@@ -38,7 +38,7 @@ function addPlayer(x, y) {
             height: size,
             xPosition: x,
             yPosition: y,
-            angleDegrees: -35
+            angleDegrees: 90
         }
     )
     let render = new RenderComponent({
