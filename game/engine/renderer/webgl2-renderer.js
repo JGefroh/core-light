@@ -1,17 +1,10 @@
 import { default as System } from '@core/system';
 import Colors from '../util/colors';
 
-import { compileShader } from './util/shader-util';
-
-import { default as quadVertexShaderSourceCode } from './shaders/quad-vertex-shader';
-import { default as quadFragmentShaderSourceCode } from './shaders/quad-fragment-shader';
-import { default as quadAsCircleFragmentShaderSourceCode } from './shaders/quad-as-circle-fragment-shader';
-import { default as quadAsLightFragmentShaderSourceCode } from './shaders/quad-as-light-fragment-shader';
-import { default as pathFragmentShaderSourceCode } from './shaders/path-fragment-shader';
-import { default as pathRadialFragmentShaderSourceCode } from './shaders/path-radial-fragment-shader';
-import { default as pathVertexShaderSourceCode } from './shaders/path-vertex-shader';
 import LightPathProgram from './webgl2-programs/light-path-program';
 import PathProgram from './webgl2-programs/path-program';
+import QuadProgram from './webgl2-programs/quad-program';
+import CircleProgram from './webgl2-programs/circle-program';
 
 export default class WebGl2Renderer {
 
@@ -28,7 +21,6 @@ export default class WebGl2Renderer {
       'rectangle': 'QUAD',
       'circle': 'CIRCLE',
       'blob': 'QUAD',
-      'light': 'LIGHT',
       'path': 'PATH'
     }
 
@@ -37,9 +29,6 @@ export default class WebGl2Renderer {
     // Quads for Shapes - old programs
     this._initializeQuadProgram(renderCtx)
     this._initializeCircleProgram(renderCtx)
-    this._initializeLightProgram(renderCtx)
-    this._initializeQuadBuffers(renderCtx)
-
 
     // Refactored programs
     this._initializePathProgram(renderCtx);
@@ -142,7 +131,7 @@ export default class WebGl2Renderer {
     renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, buffer);
     renderCtx.bufferData(renderCtx.ARRAY_BUFFER, flatPoints, renderCtx.DYNAMIC_DRAW);
 
-    const projectionMatrix = this._buildProjectionMatrix(renderCtx, viewport);
+    const projectionMatrix = this.perFrameCache['projectionMatrix'] || this._buildProjectionMatrix(renderCtx, viewport);
     renderCtx.uniformMatrix4fv(program.uniforms.u_projectionMatrix, false, projectionMatrix);
 
     if (program.uniforms.u_color) {
@@ -178,11 +167,11 @@ export default class WebGl2Renderer {
     renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, buffer);
     renderCtx.bufferData(renderCtx.ARRAY_BUFFER, vertices, renderCtx.STATIC_DRAW);
 
-    const projectionMatrix = this._buildProjectionMatrix(renderCtx, viewport);
+    const projectionMatrix = this.perFrameCache['projectionMatrix'] || this._buildProjectionMatrix(renderCtx, viewport);
     renderCtx.uniformMatrix4fv(program.uniforms.u_projectionMatrix, false, projectionMatrix);
 
     // Gradient (for in to out fuzziness)
-    const { stopCount, stops, colors } = this._parseGradientStops(fill);
+    const { stopCount, stops, colors } = this.colorUtil.parseGradientStops(fill);
     renderCtx.uniform1i(program.uniforms.u_stopCount, stopCount);
     renderCtx.uniform1fv(program.uniforms.u_stops, stops);
     renderCtx.uniform4fv(program.uniforms.u_colors, colors);
@@ -273,16 +262,14 @@ export default class WebGl2Renderer {
   }
 
   _flushFrameBuffer(renderCtx, viewport, shape) {
-    if (!shape || !this.perFrameCache['instanceBuffers'][shape]?.offsets?.length) {
+    const instanceBuffersForShape = this.perFrameCache['instanceBuffers'][shape];
+    if (!instanceBuffersForShape || !instanceBuffersForShape?.offsets?.length) {
       return;
     }
 
-    const instanceBuffersForShape = this.perFrameCache['instanceBuffers'][shape];
-    const instanceCount = instanceBuffersForShape.offsets.length / 2;
-    if (instanceCount === 0) return;
-
     let programName = this.programNameByShapeName[shape] || 'QUAD'
-    const program = this.programs[programName];
+
+    const program = this.programs[programName].getProgram();
     renderCtx.useProgram(program.program);
 
     // Set up textures if any are loaded.
@@ -293,31 +280,19 @@ export default class WebGl2Renderer {
     }
 
     let index = this._getFlushIndex();
-    const vao = this.vertexArrayObjects[`${programName}_${index}`];
-    renderCtx.bindVertexArray(vao);
-    let projectionMatrix = this.perFrameCache['projectionMatrix']
-    renderCtx.uniformMatrix4fv(program.uniforms['u_projectionMatrix'], false, projectionMatrix);
 
-    // Offsets and positions
-    this._bindToBufferIfExists(renderCtx, `${programName}_INSTANCE_OFFSET_${index}`, instanceBuffersForShape.offsets)
+    renderCtx.bindVertexArray(this.programs[programName].getVertexArrayObjects()[`${index}`]);
+    renderCtx.uniformMatrix4fv(program.uniforms['u_projectionMatrix'], false, this.perFrameCache['projectionMatrix']);
 
-    // Colors
-    this._bindToBufferIfExists(renderCtx, `${programName}_INSTANCE_COLOR_${index}`, instanceBuffersForShape.colors)
+    this._bindToBufferIfExists(renderCtx, this.programs[programName].getBuffers(), `INSTANCE_OFFSET_${index}`, instanceBuffersForShape.offsets)
+    this._bindToBufferIfExists(renderCtx, this.programs[programName].getBuffers(), `INSTANCE_SCALE_${index}`, instanceBuffersForShape.scales)
+    this._bindToBufferIfExists(renderCtx, this.programs[programName].getBuffers(), `INSTANCE_ANGLE_${index}`, instanceBuffersForShape.angles)
+    this._bindToBufferIfExists(renderCtx, this.programs[programName].getBuffers(), `INSTANCE_TEXTURE_UV_BOUNDS_${index}`, instanceBuffersForShape.textureUVBounds)
+    this._bindToBufferIfExists(renderCtx, this.programs[programName].getBuffers(), `INSTANCE_COLOR_${index}`, instanceBuffersForShape.colors)
+    this._bindToBufferIfExists(renderCtx, this.programs[programName].getBuffers(), `INSTANCE_BORDER_SIZE_${index}`, instanceBuffersForShape.borderSizes)
+    this._bindToBufferIfExists(renderCtx, this.programs[programName].getBuffers(), `INSTANCE_BORDER_COLOR_${index}`, instanceBuffersForShape.borderColors)
 
-    // Scale
-    this._bindToBufferIfExists(renderCtx, `${programName}_INSTANCE_SCALE_${index}`, instanceBuffersForShape.scales)
-
-    // Angles
-    this._bindToBufferIfExists(renderCtx, `${programName}_INSTANCE_ANGLE_${index}`, instanceBuffersForShape.angles)
-
-    // Borders
-    this._bindToBufferIfExists(renderCtx, `${programName}_INSTANCE_BORDER_SIZE_${index}`, instanceBuffersForShape.borderSizes)
-    this._bindToBufferIfExists(renderCtx, `${programName}_INSTANCE_BORDER_COLOR_${index}`, instanceBuffersForShape.borderColors)
-
-    // Textures
-    this._bindToBufferIfExists(renderCtx, `${programName}_INSTANCE_TEXTURE_UV_BOUNDS_${index}`, instanceBuffersForShape.textureUVBounds)
-
-    renderCtx.drawArraysInstanced(renderCtx.TRIANGLES, 0, 6, instanceCount);
+    renderCtx.drawArraysInstanced(renderCtx.TRIANGLES, 0, 6, instanceBuffersForShape.offsets.length / 2);
 
     // Clear
     renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, null);
@@ -326,8 +301,8 @@ export default class WebGl2Renderer {
     this._ensureInstanceBufferForShape(shape)
   }
 
-  _bindToBufferIfExists(renderCtx, key, array) {
-    const buffer = this.buffers[key];
+  _bindToBufferIfExists(renderCtx, buffers, key, array) {
+    const buffer = buffers[key];
 
     if (!array?.length) {
       return;
@@ -339,45 +314,15 @@ export default class WebGl2Renderer {
   ///// WEBGL2 Setup
 
   _initializeQuadProgram(renderCtx) {
-    // Buffered
-    const program = renderCtx.createProgram();
-
-    let quadVertexShader = compileShader(renderCtx, quadVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
-    renderCtx.attachShader(program, quadVertexShader);
-
-    let quadFragmentShader = compileShader(renderCtx, quadFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
-    renderCtx.attachShader(program, quadFragmentShader);
-
-    renderCtx.linkProgram(program);
-
-    this.programs['QUAD'] = {
-      program: program,
-      attributes: {},
-      uniforms: {
-        u_projectionMatrix: renderCtx.getUniformLocation(program, 'u_projectionMatrix'),
-      }
-    }
+    let program = new QuadProgram({flushCountMax: this.flushCountMax});
+    program.initialize(renderCtx);
+    this.programs['QUAD'] = program;
   }
 
   _initializeCircleProgram(renderCtx) {
-    // Buffered
-    const program = renderCtx.createProgram();
-
-    let quadVertexShader = compileShader(renderCtx, quadVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
-    renderCtx.attachShader(program, quadVertexShader);
-
-    let quadAsCircleFragmentShader = compileShader(renderCtx, quadAsCircleFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
-    renderCtx.attachShader(program, quadAsCircleFragmentShader);
-
-    renderCtx.linkProgram(program);
-
-    this.programs['CIRCLE'] = {
-      program: program,
-      attributes: {},
-      uniforms: {
-        u_projectionMatrix: renderCtx.getUniformLocation(program, 'u_projectionMatrix'),
-      }
-    }
+    let program = new CircleProgram({flushCountMax: this.flushCountMax});
+    program.initialize(renderCtx);
+    this.programs['CIRCLE'] = program;
   }
 
   _initializePathProgram(renderCtx) {
@@ -386,133 +331,10 @@ export default class WebGl2Renderer {
     this.programs['PATH'] = program;
   }
 
-
-  _initializeLightProgram(renderCtx) {
-    // Buffered
-    const program = renderCtx.createProgram();
-
-    let quadVertexShader = compileShader(renderCtx, quadVertexShaderSourceCode, renderCtx.VERTEX_SHADER)
-    renderCtx.attachShader(program, quadVertexShader);
-
-    let quadAsLightFragmentShader = compileShader(renderCtx, quadAsLightFragmentShaderSourceCode, renderCtx.FRAGMENT_SHADER)
-    renderCtx.attachShader(program, quadAsLightFragmentShader);
-
-    renderCtx.linkProgram(program);
-
-    this.programs['LIGHT'] = {
-      program: program,
-      attributes: {},
-      uniforms: {
-        u_projectionMatrix: renderCtx.getUniformLocation(program, 'u_projectionMatrix'),
-      }
-    }
-  }
-
   _initializeRaycastLightProgram(renderCtx) {
     let program = new LightPathProgram();
     program.initialize(renderCtx);
     this.programs['LIGHT_PATH'] = program;
-  }
-
-  _initializeBuffers(renderCtx, programType) {
-    const program = this.programs[programType];
-
-    for (let index = 0; index < this.flushCountMax; index++) {
-      const vao = renderCtx.createVertexArray();
-      renderCtx.bindVertexArray(vao);
-      this.vertexArrayObjects[`${programType}_${index}`] = vao;
-
-      // === Per-vertex position (static geometry for quad) ===
-      const quadVertices = new Float32Array([
-        -0.5, -0.5,
-        0.5, -0.5,
-        -0.5, 0.5,
-        -0.5, 0.5,
-        0.5, -0.5,
-        0.5, 0.5
-      ]);
-      const quadVertexBuffer = renderCtx.createBuffer();
-      this.buffers[`${programType}_${index}`] = quadVertexBuffer;
-      renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, quadVertexBuffer);
-      renderCtx.bufferData(renderCtx.ARRAY_BUFFER, quadVertices, renderCtx.STATIC_DRAW);
-
-      renderCtx.enableVertexAttribArray(0);
-      renderCtx.vertexAttribPointer(0, 2, renderCtx.FLOAT, false, 0, 0);
-      renderCtx.vertexAttribDivisor(0, 0); // per-vertex
-
-      // === Per-instance offset (vec2) ===
-      this.initializeBuffersFor(renderCtx, `${programType}_INSTANCE_OFFSET`, this.maxBufferSize, renderCtx.DYNAMIC_DRAW, index, () => {
-        const locOffset = renderCtx.getAttribLocation(program.program, 'a_instanceOffset');
-        renderCtx.enableVertexAttribArray(locOffset);
-        renderCtx.vertexAttribPointer(locOffset, 2, renderCtx.FLOAT, false, 0, 0);
-        renderCtx.vertexAttribDivisor(locOffset, 1); // per-instance
-      })
-      // === Per-instance color (vec4) ===
-      this.initializeBuffersFor(renderCtx, `${programType}_INSTANCE_COLOR`, this.maxBufferSize * 2, renderCtx.DYNAMIC_DRAW, index, () => {
-        const locColor = renderCtx.getAttribLocation(program.program, 'a_instanceColor');
-        renderCtx.enableVertexAttribArray(locColor);
-        renderCtx.vertexAttribPointer(locColor, 4, renderCtx.FLOAT, false, 0, 0);
-        renderCtx.vertexAttribDivisor(locColor, 1); // per-instance
-      })
-
-      // === Per-instance scale (vec2) ===
-      this.initializeBuffersFor(renderCtx, `${programType}_INSTANCE_SCALE`, this.maxBufferSize, renderCtx.DYNAMIC_DRAW, index, () => {
-        const locScale = renderCtx.getAttribLocation(program.program, 'a_instanceScale');
-        renderCtx.enableVertexAttribArray(locScale);
-        renderCtx.vertexAttribPointer(locScale, 2, renderCtx.FLOAT, false, 0, 0);
-        renderCtx.vertexAttribDivisor(locScale, 1); // per-instance
-    
-      })
-      // === Per-instance angle (float) ===
-      this.initializeBuffersFor(renderCtx, `${programType}_INSTANCE_ANGLE`, this.maxBufferSize, renderCtx.DYNAMIC_DRAW, index, () => {
-        const locAngle = renderCtx.getAttribLocation(program.program, 'a_instanceAngleDegrees');
-        renderCtx.enableVertexAttribArray(locAngle);
-        renderCtx.vertexAttribPointer(locAngle, 1, renderCtx.FLOAT, false, 0, 0);
-        renderCtx.vertexAttribDivisor(locAngle, 1); // per-instance
-      })
-
-      // === Per-instance border size (float) ===
-      this.initializeBuffersFor(renderCtx, `${programType}_INSTANCE_BORDER_SIZE`, this.maxBufferSize, renderCtx.DYNAMIC_DRAW, index, () => {
-        const locBorderSize = renderCtx.getAttribLocation(program.program, 'a_instanceBorderSize');
-        renderCtx.enableVertexAttribArray(locBorderSize);
-        renderCtx.vertexAttribPointer(locBorderSize, 1, renderCtx.FLOAT, false, 0, 0);
-        renderCtx.vertexAttribDivisor(locBorderSize, 1); // per-instance
-      })
-      
-      // === Per-instance border color (vec4) ===
-      this.initializeBuffersFor(renderCtx, `${programType}_INSTANCE_BORDER_COLOR`, this.maxBufferSize * 2, renderCtx.DYNAMIC_DRAW, index, () => {
-        const locBorderColor = renderCtx.getAttribLocation(program.program, 'a_instanceBorderColor');
-        renderCtx.enableVertexAttribArray(locBorderColor);
-        renderCtx.vertexAttribPointer(locBorderColor, 4, renderCtx.FLOAT, false, 0, 0);
-        renderCtx.vertexAttribDivisor(locBorderColor, 1); // per-instance
-      })
-      
-      // === Per-instance UV for a texture (vec4) ===
-      this.initializeBuffersFor(renderCtx, `${programType}_INSTANCE_TEXTURE_UV_BOUNDS`, this.maxBufferSize * 2, renderCtx.DYNAMIC_DRAW, index, () => {
-        const locTextureUV = renderCtx.getAttribLocation(program.program, 'a_instanceTextureUvBounds');
-        renderCtx.enableVertexAttribArray(locTextureUV);
-        renderCtx.vertexAttribPointer(locTextureUV, 4, renderCtx.FLOAT, false, 0, 0);
-        renderCtx.vertexAttribDivisor(locTextureUV, 1); // per-instance
-      })
-
-      // Clean up
-      renderCtx.bindVertexArray(null);
-      renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, null);
-    }
-  }
-
-  initializeBuffersFor(renderCtx, key, size = this.maxBufferSize, drawType = renderCtx.DYNAMIC_DRAW, index, vertexBindFn = () => {}) {
-      let buffer = renderCtx.createBuffer()
-      this.buffers[`${key}_${index}`] = buffer;
-      renderCtx.bindBuffer(renderCtx.ARRAY_BUFFER, buffer);
-      renderCtx.bufferData(renderCtx.ARRAY_BUFFER, size, drawType); // dummy size
-
-      vertexBindFn()
-  }
-
-  _initializeQuadBuffers(renderCtx) {
-    this._initializeBuffers(renderCtx, 'QUAD')
-    this._initializeBuffers(renderCtx, 'CIRCLE')
   }
 
   _buildProjectionMatrix(renderCtx, viewport) {
@@ -561,22 +383,5 @@ export default class WebGl2Renderer {
     }
 
     return new Float32Array(vertices);
-  }
-
-  _parseGradientStops(fillArray) {
-    const stops = [];
-    const colors = [];
-
-    for (const [offset, colorStr] of fillArray) {
-      const rgba = this.colorUtil.colorToRaw(colorStr, 255); // returns {r, g, b, a}
-      stops.push(offset);
-      colors.push(rgba.r, rgba.g, rgba.b, rgba.a);
-    }
-
-    return {
-      stopCount: fillArray.length,
-      stops: new Float32Array(stops),
-      colors: new Float32Array(colors)
-    };
   }
 } 

@@ -113,4 +113,21 @@ export default class Colors {
     };
     return result;
   }
+
+  parseGradientStops(fillArray) {
+    const stops = [];
+    const colors = [];
+
+    for (const [offset, colorStr] of fillArray) {
+      const rgba = this.colorToRaw(colorStr, 255); // returns {r, g, b, a}
+      stops.push(offset);
+      colors.push(rgba.r, rgba.g, rgba.b, rgba.a);
+    }
+
+    return {
+      stopCount: fillArray.length,
+      stops: new Float32Array(stops),
+      colors: new Float32Array(colors)
+    };
+  }
 }
