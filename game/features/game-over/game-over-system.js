@@ -22,7 +22,7 @@ export default class GameOverSystem extends System {
                 key: 'GAME_OVER',
                 text: 'YOU WIN - GAME OVER',
                 xPosition: (window.innerWidth / 2) - 300,
-                yPosition: 20,
+                yPosition: window.innerHeight / 4,
                 width: 1000,
                 height: 500,
                 fontSize: 50,

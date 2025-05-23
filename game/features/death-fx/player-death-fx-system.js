@@ -196,7 +196,7 @@ export default class PlayerDeathFxSystem extends System {
             key: 'GAME_OVER',
             text: 'YOU DIED - GAME OVER',
             xPosition: (window.innerWidth / 2) - 300,
-            yPosition: 20,
+            yPosition: window.innerHeight / 4,
             width: 1000,
             height: 500,
             fontSize: 50,
