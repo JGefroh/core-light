@@ -93,7 +93,7 @@ const map = {
         {type: 'CARDBOARD_BOX', xPosition: 140, yPosition: -420, width: 30, height: 20, angleDegrees: 90, collision: 'wall' }, // box
         {type: 'CARDBOARD_BOX', xPosition: 120, yPosition: -390, width: 20, height: 20, angleDegrees: 90, collision: 'wall' }, // box
         {type: 'CARDBOARD_BOX', xPosition: 140, yPosition: -390, width: 20, height: 20, angleDegrees: 90, collision: 'wall' }, // box
-        {type: 'LIGHT_FIXTURE', xPosition: 627, yPosition: -190, width: 30, height: 32, angleDegrees: 180, collision: 'wall' },
+        {type: 'LIGHT_FIXTURE', xPosition: 612, yPosition: -190, width: 30, height: 32, angleDegrees: 180, collision: 'wall' },
 
         {type: 'METAL_SHELF_FRONT', xPosition: 60, yPosition: 30, width: 80, height: 80, collision: 'wall', angleDegrees: 20 },
 

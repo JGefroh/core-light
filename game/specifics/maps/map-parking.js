@@ -3,21 +3,21 @@ const map = {
         {xPosition: 0, yPosition: 0, width: 620, height: 300, color: '#1A1A1A' }, // Main Parking Lot
         {xPosition: 260, yPosition: 185, width: 100, height: 500, color: '#1A1A1A' }, // Right Truck Filler
         {xPosition: -260, yPosition: 185, width: 100, height: 500, color: '#1A1A1A' }, // Left Truck Filler
-        {xPosition: -660, yPosition: 150, width: 700, height: 600, color: '#1A1A1A' }, // Left Truck Aea
+        {xPosition: -360, yPosition: 150, width: 200, height: 600, color: '#1A1A1A' }, // Left Truck Aea
         {xPosition: 660, yPosition: 150, width: 700, height: 900, color: '#1A1A1A' }, // Right Truck Aea
     ],
     walls: [
         {from: [310,442], to: [310, 130]}, // Far left wall
         {from: [310,0], to: [310, -152]}, 
         {offset: [-620, 0]},
-        {offset: [-620, 0]}, // Complex A Start
+        {offset: [-120, 0]}, // Complex A Start
         {offset: [0, 250]},
-        {offset: [620, 0]},
+        {offset: [120, 0]},
         {offset: [0, -250]}, // Complex A End
         {from: [-310,440], to: [-310, 190]}, 
-        {offset: [-620, 0]},
+        {offset: [-120, 0]},
         {offset: [0, 250]}, // Complex A End
-        {offset: [620, 0]}, // Complex A End
+        {offset: [120, 0]}, // Complex A End
 
     ],
     props: [
