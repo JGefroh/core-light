@@ -124,7 +124,8 @@ export default class MapGeneratorSystem extends System {
                 radius: light.radius,
                 type: light.type,
                 angleDegrees: light.angleDegrees,
-                coneDegrees: light.coneDegrees
+                coneDegrees: light.coneDegrees,
+                colors: light.colors
             });
         });
     }
@@ -157,7 +158,8 @@ export default class MapGeneratorSystem extends System {
         entity.addComponent(new LightSourceComponent({
             lightType: lightType,
             maxDistance: radius,
-            coneDegrees: coneDegrees || 45
+            coneDegrees: coneDegrees || 45,
+            colors: lightDefinition.colors
         }))
         this._core.addEntity(entity);
     }

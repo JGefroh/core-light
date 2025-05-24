@@ -25,6 +25,13 @@ export default class LightSourceComponent extends Component {
         // For lightType == 'self'
         this.padding = payload.padding || 0; // If self-illuminated, how far the light goes out
 
+        this.colors = payload.colors || [
+            [0.0, 'rgba(255, 250, 230, 1.0)'],
+            [0.1, 'rgba(255, 245, 200, 1.0)'],
+            [0.8, 'rgba(255, 220, 150, 0.5)'],
+            [1.0,  'rgba(255, 220, 150, 0)'],
+        ];
+
 
 
         // Cache for light

@@ -116,4 +116,8 @@ export default class Lightable extends Tag {
         }
         return lightComponent.flickerStateOn;
     }
+
+    getColors() {
+        return this.entity.getComponent('LightSourceComponent').colors;
+    }
 } 
