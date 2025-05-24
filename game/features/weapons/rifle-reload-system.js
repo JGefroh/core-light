@@ -2,7 +2,7 @@ import { default as Entity } from '@core/entity.js';
 import { default as System } from '@core/system';
 
 import { toCoordinateUnitsFromMeters } from '@game/utilities/distance-util';
-import { notYetTime } from '@game/utilities/timing-util.js';
+import { notYetTime } from '@core/utilities/timing-util.js';
 
 // Used to render the bullet
 import VectorComponent from '@game/engine/movement/vector-component';

@@ -2,7 +2,6 @@ import { default as System } from '@core/system';
 import { default as Entity } from '@core/entity.js'
 
 import { isPointInRotatedRect } from '@game/engine/collision/collision-util';
-import { notYetTime } from '@game/utilities/timing-util.js'
 
 import GuiCanvasRenderComponent from '@game/engine/gui/gui-canvas-render-component';
 
@@ -70,7 +69,7 @@ export default class GuiSystem extends System {
 
       this._renderCanvas(canvasCtx)
 
-      if (!notYetTime(30, this.hoverLastChecked)) {
+      if (!this.notYetTime(30, this.hoverLastChecked)) {
         this.hoverLastChecked = Date.now();
         this.checkUIHover();
       }

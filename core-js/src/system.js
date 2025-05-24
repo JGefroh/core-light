@@ -1,5 +1,5 @@
 import { default as Core } from '@core/core'
-import { notYetTime } from '@game/utilities/timing-util.js'
+import { notYetTime } from '@core/utilities/timing-util.js'
 
 export default class System {
   constructor() {

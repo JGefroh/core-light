@@ -2,7 +2,6 @@ import { default as Entity } from '@core/entity.js';
 import { default as System } from '@core/system';
 
 import { toCoordinateUnitsFromMeters } from '@game/utilities/distance-util';
-import { notYetTime } from '@game/utilities/timing-util.js';
 
 // Used to render the bullet
 import VectorComponent from '@game/engine/movement/vector-component';
@@ -45,7 +44,7 @@ export default class RifleFiringSystem extends System {
         let weapon = this.weapon;
         let weaponTag = payload.tag;
         let bulletMath = this._calculateBulletMath(weapon);
-        if (notYetTime(bulletMath.timesPerSecond, weaponTag.getLastFired())) {
+        if (this.notYetTime(bulletMath.timesPerSecond, weaponTag.getLastFired())) {
           return;
         }
         if (weaponTag.getCurrentAmmunition() <= 0) {
