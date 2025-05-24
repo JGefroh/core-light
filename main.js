@@ -29,9 +29,11 @@ setPageMetadata();
           <p><a href="/?forceload" style="color: white;">Try playing anyways</p>
           <p><a href="https://github.com/jgefroh/core-light" style="color: white;">Github</a></p>
           <hr>
-          <h2>Screenshots</h2>
+          <h2>Media</h2>
           <hr>
-          <img src="/screenshots/screenshot-3.jpg" width="100%"/>
+          <img src="/screenshots/title.gif" width="100%"/>
+          <hr>
+          <img src="/screenshots/action.gif" width="100%"/>
           <hr>
           <img src="/screenshots/screenshot-4.jpg" width="100%"/>
           <hr>
