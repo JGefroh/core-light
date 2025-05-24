@@ -24,7 +24,7 @@ import HealthComponent from '@game/genre/combat/health-component';
 import TrailEmitterComponent from '../features/trail-fx/trail-emitter-component';
 
 export function createTestData() {
-    let player = addPlayer(310, -450)
+    let player = addPlayer(550, -650)
     _createRifle(player)
 }
 
@@ -38,7 +38,7 @@ function addPlayer(x, y) {
             height: size,
             xPosition: x,
             yPosition: y,
-            angleDegrees: 90
+            angleDegrees: -180
         }
     )
     let render = new RenderComponent({
